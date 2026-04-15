@@ -4,108 +4,114 @@
   box-sizing: border-box;
 }
 
-html, body {
-  width: 100%;
-  min-height: 100%;
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  font-family: Arial, sans-serif;
+  font-family: Arial, Helvetica, sans-serif;
   background: #050510;
-  color: white;
+  color: #ffffff;
+  overflow-x: hidden;
+}
+
+a {
+  text-decoration: none;
 }
 
 .hero {
+  position: relative;
   min-height: 100vh;
   width: 100%;
-  background-image: url("assets/hero.jpg");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-
+  background: url("assets/hero.jpg") center center / cover no-repeat;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
   padding: 40px 20px;
-  position: relative;
 }
 
-.hero::before {
-  content: "";
+.overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    to bottom,
-    rgba(5, 5, 16, 0.15),
-    rgba(5, 5, 16, 0.28),
-    rgba(5, 5, 16, 0.55),
-    rgba(5, 5, 16, 0.82)
-  );
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(6, 7, 20, 0.15),
+      rgba(8, 8, 24, 0.28),
+      rgba(8, 8, 24, 0.55),
+      rgba(5, 5, 16, 0.84)
+    );
+  z-index: 1;
 }
 
 .content {
   position: relative;
   z-index: 2;
   width: 100%;
-  max-width: 900px;
+  max-width: 980px;
 }
 
 .top-text {
   font-size: 18px;
   letter-spacing: 4px;
-  color: rgba(255,255,255,0.9);
+  color: rgba(255, 255, 255, 0.9);
   margin-bottom: 18px;
+  text-transform: uppercase;
 }
 
 h1 {
-  font-size: clamp(56px, 9vw, 110px);
-  line-height: 1;
+  font-size: clamp(58px, 9vw, 120px);
+  line-height: 0.95;
   font-weight: 800;
   margin-bottom: 18px;
-  background: linear-gradient(90deg, #9fd3ff, #d7c9ff, #ffb9c8);
+  background: linear-gradient(90deg, #9cd6ff 0%, #d8ccff 50%, #ffb8c7 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   text-shadow:
-    0 0 12px rgba(120,180,255,0.30),
-    0 0 28px rgba(170,120,255,0.20);
+    0 0 10px rgba(112, 180, 255, 0.25),
+    0 0 30px rgba(171, 122, 255, 0.16);
 }
 
 .subtitle {
-  font-size: clamp(18px, 2vw, 28px);
-  color: rgba(255,255,255,0.88);
-  margin-bottom: 40px;
+  font-size: clamp(20px, 2.1vw, 30px);
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 38px;
 }
 
 .listen-btn {
   display: inline-block;
-  border: 2px solid rgba(180, 220, 255, 0.9);
-  background: rgba(30, 70, 140, 0.25);
-  color: white;
-  padding: 18px 38px;
-  font-size: 28px;
-  font-weight: 700;
+  border: 2px solid rgba(186, 230, 255, 0.95);
+  background: rgba(32, 75, 145, 0.22);
+  color: #ffffff;
+  padding: 20px 42px;
+  font-size: clamp(22px, 2vw, 32px);
+  font-weight: 800;
   border-radius: 999px;
-  cursor: pointer;
-  margin-bottom: 40px;
   box-shadow:
-    0 0 18px rgba(80, 210, 255, 0.45),
-    0 0 40px rgba(0, 120, 255, 0.20),
-    inset 0 0 14px rgba(255,255,255,0.08);
-  backdrop-filter: blur(6px);
-  transition: 0.2s ease;
+    0 0 18px rgba(96, 210, 255, 0.45),
+    0 0 38px rgba(45, 136, 255, 0.18),
+    inset 0 0 18px rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  margin-bottom: 36px;
 }
 
 .listen-btn:hover {
   transform: translateY(-2px) scale(1.02);
-  background: rgba(45, 90, 170, 0.32);
+  background: rgba(45, 92, 172, 0.3);
+  box-shadow:
+    0 0 24px rgba(96, 210, 255, 0.65),
+    0 0 42px rgba(45, 136, 255, 0.24),
+    inset 0 0 18px rgba(255, 255, 255, 0.12);
 }
 
 .desc {
-  font-size: clamp(16px, 2vw, 22px);
+  font-size: clamp(18px, 1.8vw, 28px);
   line-height: 1.7;
-  color: rgba(255,255,255,0.82);
-  margin-bottom: 38px;
+  color: rgba(255, 255, 255, 0.84);
+  margin-bottom: 34px;
 }
 
 .socials {
@@ -115,37 +121,75 @@ h1 {
   flex-wrap: wrap;
 }
 
-.socials a {
-  text-decoration: none;
-  color: white;
+.social-btn {
+  min-width: 130px;
   padding: 14px 22px;
-  min-width: 120px;
   border-radius: 999px;
-  border: 1px solid rgba(255,255,255,0.22);
-  background: rgba(255,255,255,0.08);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(8px);
-  font-weight: 600;
-  transition: 0.2s ease;
+  transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
 }
 
-.socials a:hover {
-  background: rgba(255,255,255,0.16);
+.social-btn:hover {
   transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 16px rgba(255, 255, 255, 0.12);
 }
 
-.player {
-  width: min(900px, 92%);
-  margin: 24px auto 50px auto;
+.player-section {
+  position: relative;
+  padding: 70px 20px 80px;
+  background:
+    radial-gradient(circle at top, rgba(96, 65, 170, 0.18), rgba(5, 5, 16, 0.96) 50%),
+    #050510;
 }
 
-.hidden {
-  display: none;
+.player-wrap {
+  max-width: 980px;
+  margin: 0 auto;
+  text-align: center;
 }
 
-@media (max-width: 768px) {
+.player-wrap h2 {
+  font-size: clamp(36px, 4vw, 56px);
+  margin-bottom: 12px;
+  font-weight: 800;
+  background: linear-gradient(90deg, #9cd6ff 0%, #d8ccff 50%, #ffb8c7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.player-subtitle {
+  font-size: clamp(18px, 2vw, 24px);
+  color: rgba(255, 255, 255, 0.78);
+  margin-bottom: 28px;
+}
+
+.player-card {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  padding: 16px;
+  box-shadow:
+    0 0 28px rgba(86, 136, 255, 0.08),
+    inset 0 0 18px rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(8px);
+}
+
+@media (max-width: 900px) {
+  .hero {
+    padding: 32px 18px;
+    background-position: center top;
+  }
+
   .top-text {
     font-size: 14px;
     letter-spacing: 3px;
+    margin-bottom: 14px;
   }
 
   .subtitle {
@@ -153,19 +197,52 @@ h1 {
   }
 
   .listen-btn {
-    font-size: 22px;
-    padding: 15px 28px;
+    padding: 16px 28px;
     margin-bottom: 28px;
   }
 
   .desc {
     font-size: 18px;
-    margin-bottom: 28px;
+    margin-bottom: 26px;
   }
 
-  .socials a {
-    min-width: 100px;
+  .social-btn {
+    min-width: 110px;
+    font-size: 16px;
+    padding: 12px 18px;
+  }
+
+  .player-section {
+    padding: 56px 16px 70px;
+  }
+}
+
+@media (max-width: 600px) {
+  .hero {
+    align-items: flex-start;
+    padding-top: 70px;
+    padding-bottom: 50px;
+  }
+
+  h1 {
+    font-size: clamp(50px, 13vw, 76px);
+  }
+
+  .subtitle {
+    font-size: 18px;
+    line-height: 1.4;
+  }
+
+  .desc {
+    line-height: 1.6;
+  }
+
+  .socials {
+    gap: 12px;
+  }
+
+  .social-btn {
+    min-width: 96px;
     font-size: 15px;
-    padding: 12px 16px;
   }
 }
