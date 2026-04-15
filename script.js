@@ -1,9 +1,14 @@
-function togglePlayer() {
-    const player = document.getElementById("player");
+document.addEventListener("DOMContentLoaded", () => {
+  const listenBtn = document.querySelector(".listen-btn");
+  const playerSection = document.getElementById("player-section");
 
-    if (player.classList.contains("hidden")) {
-        player.classList.remove("hidden");
-    } else {
-        player.classList.add("hidden");
-    }
-}
+  if (listenBtn && playerSection) {
+    listenBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      playerSection.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    });
+  }
+});
