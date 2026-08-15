@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="gold" x1="8" y1="4" x2="56" y2="60" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff0a8"/>
+      <stop offset=".38" stop-color="#e2b85e"/>
+      <stop offset=".72" stop-color="#b87520"/>
+      <stop offset="1" stop-color="#f2d27c"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="15" fill="#050510"/>
+  <rect x="3" y="3" width="58" height="58" rx="13" fill="url(#gold)"/>
+  <rect x="7" y="7" width="50" height="50" rx="10" fill="#080812"/>
+  <text x="31" y="40" text-anchor="middle" font-family="Arial Black,Arial,sans-serif" font-size="26" font-weight="900" letter-spacing="-2" fill="url(#gold)">DR</text>
+</svg>
