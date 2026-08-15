@@ -14,7 +14,7 @@
   --line-strong: rgba(243, 240, 233, 0.28);
   --gold: #cba25b;
   --gold-light: #edd498;
-  --display: "Syne", Arial, sans-serif;
+  --display: "Space Grotesk", Arial, sans-serif;
   --body: "Manrope", Arial, sans-serif;
   --artist-image: url("https://donrashid.com/assets/hero.jpg");
 }
@@ -23,9 +23,13 @@ html {
   scroll-behavior: smooth;
   scroll-padding-top: 90px;
   background: var(--bg);
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 body {
+  width: 100%;
+  max-width: 100%;
   min-width: 320px;
   overflow-x: hidden;
   background: var(--bg);
@@ -35,6 +39,14 @@ body {
   line-height: 1.55;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
+}
+
+main,
+.hero,
+.signal,
+.section {
+  width: 100%;
+  max-width: 100%;
 }
 
 body.menu-open {
@@ -125,7 +137,7 @@ button {
   color: var(--gold-light);
   font-family: var(--display);
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: -.08em;
   transform: rotate(-2deg);
 }
@@ -300,8 +312,8 @@ button {
   max-width: 1320px;
   font-family: var(--display);
   font-size: clamp(78px, 14.9vw, 226px);
-  font-weight: 800;
-  letter-spacing: -.082em;
+  font-weight: 700;
+  letter-spacing: -.068em;
   line-height: .69;
   text-transform: uppercase;
 }
@@ -312,6 +324,7 @@ button {
 
 .hero h1 span:last-child {
   color: transparent;
+  letter-spacing: -.045em;
   -webkit-text-stroke: clamp(1px, .12vw, 2px) rgba(243, 240, 233, .78);
   text-stroke: clamp(1px, .12vw, 2px) rgba(243, 240, 233, .78);
 }
@@ -351,6 +364,13 @@ button {
   letter-spacing: .16em;
   text-transform: uppercase;
   transition: background .25s ease, border-color .25s ease, color .25s ease, transform .25s ease;
+}
+
+.arrow {
+  display: inline-block;
+  font-family: Arial, Helvetica, sans-serif;
+  font-variant-emoji: text;
+  line-height: 1;
 }
 
 .action:hover,
@@ -420,7 +440,7 @@ button {
   padding: 0 25px;
   font-family: var(--display);
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: .18em;
   animation: signal 26s linear infinite;
 }
@@ -727,7 +747,7 @@ button {
   color: rgba(243,240,233,.18);
   font-family: var(--display);
   font-size: clamp(110px, 16vw, 250px);
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: -.09em;
   line-height: 1;
 }
@@ -1044,11 +1064,14 @@ button {
   .hero-content {
     left: 18px;
     right: 18px;
+    width: auto;
+    max-width: calc(100vw - 36px);
     bottom: 72px;
   }
 
   .hero h1 {
     font-size: clamp(70px, 18.5vw, 130px);
+    max-width: 100%;
   }
 
   .hero-scroll {
@@ -1146,12 +1169,28 @@ button {
   }
 
   .hero h1 {
-    font-size: clamp(65px, 20.6vw, 102px);
-    line-height: .72;
+    width: 100%;
+    max-width: 100%;
+    font-size: clamp(62px, 19vw, 80px);
+    letter-spacing: -.052em;
+    line-height: .76;
+  }
+
+  .hero h1 span {
+    max-width: 100%;
+    white-space: nowrap;
+  }
+
+  .hero h1 span:last-child {
+    margin-top: 7px;
+    font-size: clamp(47px, 14.8vw, 62px);
+    letter-spacing: -.018em;
+    line-height: .92;
+    -webkit-text-stroke-width: 1px;
   }
 
   .hero-lower {
-    margin-top: 30px;
+    margin-top: 25px;
   }
 
   .hero-lower > p {
@@ -1162,6 +1201,7 @@ button {
   .hero-actions {
     display: grid;
     grid-template-columns: 1fr;
+    gap: 11px;
   }
 
   .action {
@@ -1171,6 +1211,7 @@ button {
   .signal-track {
     min-height: 43px;
     font-size: 9px;
+    animation-duration: 32s;
   }
 
   .section-intro {
@@ -1274,5 +1315,3 @@ button {
     transform: none;
   }
 }
-
-/* Artist-site redesign: refined hero framing. */
