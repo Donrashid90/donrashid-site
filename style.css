@@ -235,9 +235,9 @@ button {
 .hero-media {
   z-index: -3;
   background-image: var(--artist-image);
-  background-position: center 29%;
+  background-position: center 7%;
   background-size: cover;
-  filter: saturate(.7) contrast(1.08) brightness(.76);
+  filter: saturate(.72) contrast(1.06) brightness(.84);
   transform: scale(1.015);
 }
 
