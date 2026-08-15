@@ -1171,9 +1171,9 @@ button {
   .hero h1 {
     width: 100%;
     max-width: 100%;
-    font-size: clamp(62px, 19vw, 80px);
-    letter-spacing: -.052em;
-    line-height: .76;
+    font-size: clamp(76px, 25vw, 110px);
+    letter-spacing: -.045em;
+    line-height: .72;
   }
 
   .hero h1 span {
@@ -1182,10 +1182,10 @@ button {
   }
 
   .hero h1 span:last-child {
-    margin-top: 7px;
-    font-size: clamp(47px, 14.8vw, 62px);
-    letter-spacing: -.018em;
-    line-height: .92;
+    margin-top: 5px;
+    font-size: 1em;
+    letter-spacing: -.032em;
+    line-height: .82;
     -webkit-text-stroke-width: 1px;
   }
 
