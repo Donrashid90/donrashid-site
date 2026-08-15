@@ -329,6 +329,12 @@ button {
   text-stroke: clamp(1px, .12vw, 2px) rgba(243, 240, 233, .78);
 }
 
+@media (min-width: 821px) {
+  .hero h1 span:last-child {
+    margin-top: .11em;
+  }
+}
+
 .hero-lower {
   width: min(100%, 1060px);
   margin-top: clamp(31px, 4.8vh, 54px);
