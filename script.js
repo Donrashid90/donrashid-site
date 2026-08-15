@@ -28,15 +28,36 @@ document.addEventListener("DOMContentLoaded", () => {
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape") closeMenu();
     });
+
+    window.addEventListener("resize", () => {
+      if (window.innerWidth > 820) closeMenu();
+    }, { passive: true });
   }
 
   const updateHeader = () => {
     if (!header) return;
-    header.classList.toggle("scrolled", window.scrollY > 24);
+    header.classList.toggle("scrolled", window.scrollY > 28);
   };
 
   updateHeader();
   window.addEventListener("scroll", updateHeader, { passive: true });
+
+  const revealItems = document.querySelectorAll("[data-reveal]");
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (reducedMotion || !("IntersectionObserver" in window)) {
+    revealItems.forEach((item) => item.classList.add("is-visible"));
+  } else {
+    const revealObserver = new IntersectionObserver((entries, observer) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("is-visible");
+        observer.unobserve(entry.target);
+      });
+    }, { threshold: 0.14, rootMargin: "0px 0px -6% 0px" });
+
+    revealItems.forEach((item) => revealObserver.observe(item));
+  }
 
   if (year) {
     year.textContent = String(new Date().getFullYear());
