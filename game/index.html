@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Lowrider Night Run — Don Rashid</title>
+  <meta name="description" content="Play Lowrider Night Run, the official Don Rashid browser game. Hit the hydraulics, dodge the boulevard and chase a new high score." />
+  <meta name="theme-color" content="#070708" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://donrashid.com/game/" />
+
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg?v=1" />
+  <link rel="shortcut icon" href="/assets/favicon.svg?v=1" />
+  <link rel="mask-icon" href="/assets/favicon.svg?v=1" color="#cba25b" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Lowrider Night Run — Don Rashid" />
+  <meta property="og:description" content="Hit the hydraulics. Own the boulevard. Chase a new high score." />
+  <meta property="og:url" content="https://donrashid.com/game/" />
+  <meta property="og:image" content="https://donrashid.com/assets/hero.jpg" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Lowrider Night Run — Don Rashid" />
+  <meta name="twitter:description" content="Hit the hydraulics. Own the boulevard. Chase a new high score." />
+  <meta name="twitter:image" content="https://donrashid.com/assets/hero.jpg" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css?v=6" />
+  <link rel="stylesheet" href="game.css?v=1" />
+</head>
+<body class="game-page">
+  <a class="skip-link" href="#game-main">Skip to game</a>
+  <div class="page-grain" aria-hidden="true"></div>
+
+  <header class="site-header scrolled" id="top">
+    <a class="brand" href="/" aria-label="Don Rashid home">
+      <span class="brand-mark" aria-hidden="true">DR</span>
+      <span class="brand-name">DON RASHID</span>
+    </a>
+
+    <button class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="site-nav">
+      <span></span>
+      <span></span>
+    </button>
+
+    <nav class="site-nav" id="site-nav" aria-label="Main navigation">
+      <a href="/#music">Music</a>
+      <a href="/#merch">Merch</a>
+      <a class="nav-current" href="/game/" aria-current="page">Game</a>
+      <a href="/#artist">Artist</a>
+      <a href="https://youtube.com/@donrashidofficial" target="_blank" rel="noopener noreferrer">YouTube <span class="arrow" aria-hidden="true">&#8599;&#65038;</span></a>
+      <a class="nav-stream" href="https://open.spotify.com/artist/0HbtnpVZONVd7S09jqmRZZ" target="_blank" rel="noopener noreferrer">Stream <span class="arrow" aria-hidden="true">&#8599;&#65038;</span></a>
+    </nav>
+  </header>
+
+  <main id="game-main">
+    <section class="game-hero" aria-labelledby="game-title">
+      <div class="game-ambient" aria-hidden="true"></div>
+      <div class="game-shell">
+        <div class="game-intro" data-reveal>
+          <div>
+            <p class="section-index"><span>04</span> Interactive</p>
+            <p class="game-kicker">Don Rashid presents</p>
+            <h1 id="game-title">LOWRIDER<br /><em>NIGHT RUN</em></h1>
+          </div>
+          <div class="game-intro-copy">
+            <p>Ride the midnight boulevard, hit the hydraulics and keep the chrome clear. One touch is all you need.</p>
+            <div class="game-specs" aria-label="Game details">
+              <span>One-touch control</span>
+              <span>Mobile + desktop</span>
+              <span>Local high score</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="arcade-cabinet" data-reveal>
+          <div class="cabinet-topline" aria-hidden="true">
+            <span>DR / GAME 001</span>
+            <span>3072 NIGHT DRIVE UNIT</span>
+          </div>
+
+          <div class="game-hud" aria-label="Scoreboard">
+            <div>
+              <span class="hud-label">Score</span>
+              <strong id="scoreValue">000000</strong>
+            </div>
+            <div class="hud-center">
+              <span class="hud-live"><i></i> Boulevard live</span>
+            </div>
+            <div>
+              <span class="hud-label">Best</span>
+              <strong id="bestValue">000000</strong>
+            </div>
+          </div>
+
+          <div class="game-canvas-shell" id="gameCanvasShell">
+            <canvas id="gameCanvas" width="960" height="540" aria-label="Lowrider Night Run game area">
+              Your browser does not support the game canvas.
+            </canvas>
+
+            <div class="game-overlay is-visible" id="gameOverlay">
+              <div class="overlay-mark" aria-hidden="true">DR</div>
+              <p class="overlay-kicker" id="overlayKicker">Game 001</p>
+              <h2 id="overlayTitle">OWN THE<br />BOULEVARD</h2>
+              <p id="overlayText">Jump the street hazards, collect DR tokens and keep the night run alive.</p>
+              <button class="game-start" id="startButton" type="button">Start the run <span aria-hidden="true">→</span></button>
+              <small>Tap anywhere or use Space / ↑</small>
+            </div>
+
+            <p class="game-announcement" id="gameAnnouncement" aria-live="polite"></p>
+          </div>
+
+          <div class="game-controls">
+            <button class="hydraulic-button" id="hydraulicButton" type="button">
+              <span class="hydraulic-icon" aria-hidden="true">↑</span>
+              <span><strong>Hydraulics</strong><small>Tap / Space</small></span>
+            </button>
+            <div class="control-status">
+              <span id="runStatus">Ready for the night run</span>
+              <button class="pause-button" id="pauseButton" type="button" disabled>Pause</button>
+            </div>
+          </div>
+
+          <div class="cabinet-bottomline" aria-hidden="true">
+            <span>Chrome / Pressure / Midnight streets</span>
+            <span>Turn your phone sideways for the widest view</span>
+          </div>
+        </div>
+
+        <div class="game-after" data-reveal>
+          <div>
+            <p class="eyebrow">The rules</p>
+            <h2>STAY LOW.<br /><em>JUMP CLEAN.</em></h2>
+          </div>
+          <ol>
+            <li><span>01</span><p>Tap or press Space to fire the hydraulics.</p></li>
+            <li><span>02</span><p>Clear cones, barriers and broken asphalt.</p></li>
+            <li><span>03</span><p>Collect gold DR tokens for bonus points.</p></li>
+          </ol>
+          <div class="game-links">
+            <a class="action action-primary" href="https://youtube.com/@donrashidofficial" target="_blank" rel="noopener noreferrer">Enter the sound <span class="arrow" aria-hidden="true">&#8599;&#65038;</span></a>
+            <a class="action action-ghost" href="https://shop.donrashid.com">Shop the drop <span class="arrow" aria-hidden="true">&#8599;&#65038;</span></a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer game-footer">
+    <a class="brand footer-brand" href="/" aria-label="Don Rashid home">
+      <span class="brand-mark" aria-hidden="true">DR</span>
+      <span class="brand-name">DON RASHID</span>
+    </a>
+    <p>West Coast cinematic rap / interactive artist world</p>
+    <div class="footer-socials">
+      <a href="https://open.spotify.com/artist/0HbtnpVZONVd7S09jqmRZZ" target="_blank" rel="noopener noreferrer">Spotify</a>
+      <a href="https://youtube.com/@donrashidofficial" target="_blank" rel="noopener noreferrer">YouTube</a>
+      <a href="https://x.com/donrashid72" target="_blank" rel="noopener noreferrer">X</a>
+    </div>
+    <small>© <span id="year">2026</span> Don Rashid / Game 001</small>
+  </footer>
+
+  <script src="../script.js?v=2"></script>
+  <script src="game.js?v=1"></script>
+</body>
+</html>
