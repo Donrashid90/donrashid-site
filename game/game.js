@@ -12,6 +12,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const bestValue = document.getElementById("bestValue");
   const runStatus = document.getElementById("runStatus");
   const announcement = document.getElementById("gameAnnouncement");
+  const scoreEntry = document.getElementById("scoreEntry");
+  const scoreName = document.getElementById("scoreName");
+  const scoreSubmit = document.getElementById("scoreSubmit");
+  const scoreEntryStatus = document.getElementById("scoreEntryStatus");
+  const leaderboardRoot = document.getElementById("leaderboard");
+  const leaderboardList = document.getElementById("leaderboardList");
+  const leaderboardStatus = document.getElementById("leaderboardStatus");
+  const leaderboardRefresh = document.getElementById("leaderboardRefresh");
 
   if (!canvas || !canvasShell) return;
 
@@ -22,7 +30,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const VIEW_H = 540;
   const ROAD_TOP = 370;
   const GROUND_Y = 414;
+  const GRAVITY = 1100;
+  const HYDRAULIC_IMPULSE = -620;
   const STORAGE_KEY = "don-rashid-lowrider-night-run-best-v1";
+  const NICKNAME_KEY = "don-rashid-lowrider-night-run-nickname-v1";
+  const LEADERBOARD_API = leaderboardRoot?.dataset.apiUrl || "";
 
   let mode = "idle";
   let lastTime = 0;
@@ -35,6 +47,12 @@ document.addEventListener("DOMContentLoaded", () => {
   let announcementTimer = 0;
   let animationFrame = 0;
   let best = readBest();
+  let leaderboardScores = [];
+  let runSequence = 0;
+  let currentRunId = null;
+  let currentRunPromise = Promise.resolve(null);
+  let qualifiedScore = null;
+  let qualifiedDurationMs = null;
 
   const player = {
     x: 142,
@@ -78,6 +96,150 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (error) {
       // The game remains fully playable when local storage is unavailable.
     }
+  }
+
+  function readNickname() {
+    try {
+      return localStorage.getItem(NICKNAME_KEY) || "";
+    } catch (error) {
+      return "";
+    }
+  }
+
+  function saveNickname(value) {
+    try {
+      localStorage.setItem(NICKNAME_KEY, value);
+    } catch (error) {
+      // Remembering a nickname is optional and never blocks score submission.
+    }
+  }
+
+  function setLeaderboardStatus(message = "", isError = false) {
+    if (!leaderboardStatus) return;
+    leaderboardStatus.textContent = message;
+    leaderboardStatus.classList.toggle("is-error", isError);
+  }
+
+  function setScoreEntryStatus(message = "", isError = false) {
+    if (!scoreEntryStatus) return;
+    scoreEntryStatus.textContent = message;
+    scoreEntryStatus.classList.toggle("is-error", isError);
+  }
+
+  function renderLeaderboard(scores) {
+    if (!leaderboardList) return;
+    leaderboardList.replaceChildren();
+
+    if (!scores.length) {
+      const empty = document.createElement("li");
+      empty.className = "leaderboard-empty";
+      empty.textContent = "No scores yet — be the first name on the boulevard.";
+      leaderboardList.append(empty);
+      return;
+    }
+
+    scores.forEach((entry) => {
+      const item = document.createElement("li");
+      const name = document.createElement("span");
+      const points = document.createElement("strong");
+      name.className = "leaderboard-name";
+      points.className = "leaderboard-score";
+      name.textContent = entry.name;
+      points.textContent = formatScore(entry.score);
+      item.append(name, points);
+      leaderboardList.append(item);
+    });
+  }
+
+  async function requestLeaderboard(options = {}) {
+    if (!LEADERBOARD_API) throw new Error("Leaderboard is not configured");
+    const headers = { ...(options.headers || {}) };
+    if (options.body) headers["Content-Type"] = "application/json";
+    const response = await fetch(LEADERBOARD_API, {
+      cache: "no-store",
+      credentials: "omit",
+      ...options,
+      headers
+    });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(payload.error || "Leaderboard is temporarily unavailable");
+    return payload;
+  }
+
+  async function loadLeaderboard(showProgress = true) {
+    if (showProgress) setLeaderboardStatus("Refreshing worldwide scores…");
+    if (leaderboardRefresh) leaderboardRefresh.disabled = true;
+
+    try {
+      const payload = await requestLeaderboard();
+      leaderboardScores = Array.isArray(payload.scores) ? payload.scores : [];
+      renderLeaderboard(leaderboardScores);
+      setLeaderboardStatus(leaderboardScores.length ? "Worldwide scores are live." : "The boulevard is ready for its first record.");
+      return true;
+    } catch (error) {
+      if (!leaderboardScores.length && leaderboardList) {
+        leaderboardList.replaceChildren();
+        const empty = document.createElement("li");
+        empty.className = "leaderboard-empty";
+        empty.textContent = "Worldwide scores are temporarily unavailable.";
+        leaderboardList.append(empty);
+      }
+      setLeaderboardStatus("Could not reach the worldwide leaderboard. Your local best still works.", true);
+      return false;
+    } finally {
+      if (leaderboardRefresh) leaderboardRefresh.disabled = false;
+    }
+  }
+
+  async function beginVerifiedRun(sequence) {
+    currentRunId = null;
+    try {
+      const payload = await requestLeaderboard({
+        method: "POST",
+        body: JSON.stringify({ action: "start" })
+      });
+      if (sequence !== runSequence || typeof payload.runId !== "string") return null;
+      currentRunId = payload.runId;
+      return currentRunId;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function resetScoreEntry() {
+    qualifiedScore = null;
+    qualifiedDurationMs = null;
+    if (scoreEntry) scoreEntry.hidden = true;
+    if (scoreName) {
+      scoreName.disabled = false;
+      scoreName.value = readNickname();
+    }
+    if (scoreSubmit) {
+      scoreSubmit.disabled = false;
+      scoreSubmit.textContent = "Save score →";
+    }
+    setScoreEntryStatus();
+  }
+
+  async function offerWorldwideScore(finalScore, durationMs, sequence) {
+    const [runId, boardAvailable] = await Promise.all([
+      currentRunPromise,
+      loadLeaderboard(false)
+    ]);
+
+    if (sequence !== runSequence || mode !== "gameover") return;
+    if (!runId || !boardAvailable || durationMs < 1500) return;
+
+    const lastPlace = leaderboardScores[9];
+    const madeTopTen = leaderboardScores.length < 10 || finalScore > Number(lastPlace?.score || 0);
+    if (!madeTopTen) return;
+
+    qualifiedScore = finalScore;
+    qualifiedDurationMs = durationMs;
+    if (scoreEntry) scoreEntry.hidden = false;
+    if (overlayKicker) overlayKicker.textContent = "Boulevard Top 10";
+    if (overlayText) overlayText.textContent = "Enter a public nickname below to put this run on the worldwide board.";
+    if (runStatus) runStatus.textContent = "Top 10 run — enter your nickname";
   }
 
   function formatScore(value) {
@@ -125,6 +287,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function startGame() {
+    runSequence += 1;
+    const sequence = runSequence;
     mode = "running";
     lastTime = performance.now();
     elapsed = 0;
@@ -136,6 +300,7 @@ document.addEventListener("DOMContentLoaded", () => {
     obstacles.length = 0;
     pickups.length = 0;
     particles.length = 0;
+    resetScoreEntry();
     resetPlayer();
     hideOverlay();
     if (pauseButton) {
@@ -144,6 +309,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     if (runStatus) runStatus.textContent = "Night run in progress";
     updateHud();
+    currentRunPromise = beginVerifiedRun(sequence);
     cancelAnimationFrame(animationFrame);
     animationFrame = requestAnimationFrame(loop);
   }
@@ -152,6 +318,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (mode !== "running") return;
     mode = "gameover";
     const finalScore = Math.floor(score);
+    const finalDurationMs = Math.floor(elapsed * 1000);
+    const finishedRunSequence = runSequence;
     const isNewBest = finalScore > best;
     if (isNewBest) {
       best = finalScore;
@@ -166,6 +334,46 @@ document.addEventListener("DOMContentLoaded", () => {
       text: isNewBest ? "The boulevard has a new number to beat." : "One clean jump can change the whole night.",
       button: "Run it back"
     });
+    void offerWorldwideScore(finalScore, finalDurationMs, finishedRunSequence);
+  }
+
+  async function submitWorldwideScore(event) {
+    event.preventDefault();
+    if (!scoreName || !scoreSubmit || !currentRunId || qualifiedScore === null || qualifiedDurationMs === null) return;
+    if (!scoreName.reportValidity()) return;
+
+    const nickname = scoreName.value.trim().replace(/\s+/g, " ");
+    scoreName.value = nickname;
+    scoreName.disabled = true;
+    scoreSubmit.disabled = true;
+    scoreSubmit.textContent = "Saving…";
+    setScoreEntryStatus("Saving your Top 10 run worldwide…");
+
+    try {
+      const payload = await requestLeaderboard({
+        method: "POST",
+        body: JSON.stringify({
+          action: "submit",
+          runId: currentRunId,
+          name: nickname,
+          score: qualifiedScore,
+          durationMs: qualifiedDurationMs
+        })
+      });
+
+      leaderboardScores = Array.isArray(payload.scores) ? payload.scores : leaderboardScores;
+      renderLeaderboard(leaderboardScores);
+      saveNickname(nickname);
+      scoreSubmit.textContent = "Saved ✓";
+      setScoreEntryStatus("Your score is now visible on the worldwide leaderboard.");
+      setLeaderboardStatus("Worldwide scores updated.");
+      if (runStatus) runStatus.textContent = "Worldwide score saved";
+    } catch (error) {
+      scoreName.disabled = false;
+      scoreSubmit.disabled = false;
+      scoreSubmit.textContent = "Try again →";
+      setScoreEntryStatus(error instanceof Error ? error.message : "Score could not be saved.", true);
+    }
   }
 
   function togglePause() {
@@ -195,7 +403,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!player.grounded) return;
 
     player.grounded = false;
-    player.vy = -555;
+    player.vy = HYDRAULIC_IMPULSE;
     player.compression = 1;
     player.tilt = -.055;
 
@@ -248,11 +456,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function playerBounds() {
     return {
-      x: player.x + 17,
-      y: 325 + player.y,
-      width: 162,
-      height: 92
+      x: player.x + 34,
+      y: 336 + player.y,
+      width: 136,
+      height: 66
     };
+  }
+
+  function overlapsHorizontally(a, b) {
+    return a.x < b.x + b.width && a.x + a.width > b.x;
   }
 
   function overlaps(a, b) {
@@ -268,7 +480,7 @@ document.addEventListener("DOMContentLoaded", () => {
     distance += speed * dt;
     score += dt * (25 + speed * .035);
 
-    player.vy += 1280 * dt;
+    player.vy += GRAVITY * dt;
     player.y += player.vy * dt;
     player.compression = Math.max(0, player.compression - dt * 3.8);
 
@@ -321,7 +533,11 @@ document.addEventListener("DOMContentLoaded", () => {
         height: Math.max(9, obstacle.height - 5)
       };
 
-      if (overlaps(car, hitbox)) {
+      const hasHit = obstacle.kind === "pothole"
+        ? player.grounded && overlapsHorizontally(car, hitbox)
+        : overlaps(car, hitbox);
+
+      if (hasHit) {
         endGame();
         return;
       }
@@ -848,6 +1064,8 @@ document.addEventListener("DOMContentLoaded", () => {
   if (hydraulicButton) hydraulicButton.addEventListener("pointerdown", handlePrimaryAction);
   canvas.addEventListener("pointerdown", handlePrimaryAction);
   if (pauseButton) pauseButton.addEventListener("click", togglePause);
+  if (scoreEntry) scoreEntry.addEventListener("submit", submitWorldwideScore);
+  if (leaderboardRefresh) leaderboardRefresh.addEventListener("click", () => void loadLeaderboard());
 
   document.addEventListener("keydown", (event) => {
     if (["Space", "ArrowUp", "KeyW"].includes(event.code)) {
@@ -866,7 +1084,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   window.addEventListener("resize", resizeCanvas, { passive: true });
 
+  resetScoreEntry();
   updateHud();
   resizeCanvas();
   drawScene();
+  void loadLeaderboard(false);
 });
