@@ -30,7 +30,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../style.css?v=6" />
-  <link rel="stylesheet" href="game.css?v=1" />
+  <link rel="stylesheet" href="game.css?v=2" />
 </head>
 <body class="game-page">
   <a class="skip-link" href="#game-main">Skip to game</a>
@@ -72,7 +72,7 @@
             <div class="game-specs" aria-label="Game details">
               <span>One-touch control</span>
               <span>Mobile + desktop</span>
-              <span>Local high score</span>
+              <span>Worldwide top 10</span>
             </div>
           </div>
         </div>
@@ -125,11 +125,40 @@
             </div>
           </div>
 
+          <form class="score-entry" id="scoreEntry" hidden>
+            <div class="score-entry-copy">
+              <span class="score-entry-kicker">Worldwide leaderboard</span>
+              <strong>You made the Top 10.</strong>
+              <small>Your nickname and score will be visible to everyone.</small>
+            </div>
+            <label class="score-name-field">
+              <span>Public nickname</span>
+              <input id="scoreName" name="nickname" type="text" minlength="2" maxlength="16" autocomplete="nickname" spellcheck="false" required />
+            </label>
+            <button class="score-submit" id="scoreSubmit" type="submit">Save score <span aria-hidden="true">→</span></button>
+            <p class="score-entry-status" id="scoreEntryStatus" aria-live="polite"></p>
+          </form>
+
           <div class="cabinet-bottomline" aria-hidden="true">
             <span>Chrome / Pressure / Midnight streets</span>
             <span>Turn your phone sideways for the widest view</span>
           </div>
         </div>
+
+        <section class="leaderboard" id="leaderboard" data-api-url="https://don-rashid-leaderboard.chummy-knoll-6431.chatgpt.site/api/leaderboard" aria-labelledby="leaderboard-title" data-reveal>
+          <div class="leaderboard-heading">
+            <div>
+              <p class="eyebrow">Worldwide leaderboard</p>
+              <h2 id="leaderboard-title">BOULEVARD<br /><em>TOP 10</em></h2>
+            </div>
+            <button class="leaderboard-refresh" id="leaderboardRefresh" type="button">Refresh</button>
+          </div>
+          <ol class="leaderboard-list" id="leaderboardList" aria-live="polite">
+            <li class="leaderboard-empty">Loading worldwide scores…</li>
+          </ol>
+          <p class="leaderboard-status" id="leaderboardStatus" aria-live="polite"></p>
+          <small class="leaderboard-note">Only a public nickname, score and run time are saved.</small>
+        </section>
 
         <div class="game-after" data-reveal>
           <div>
@@ -165,6 +194,6 @@
   </footer>
 
   <script src="../script.js?v=2"></script>
-  <script src="game.js?v=1"></script>
+  <script src="game.js?v=3"></script>
 </body>
 </html>
