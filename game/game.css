@@ -887,7 +887,14 @@
   }
 
   .leaderboard-heading {
+    flex-direction: column;
     align-items: flex-start;
+    gap: 24px;
+  }
+
+  .leaderboard-refresh {
+    width: 100%;
+    min-height: 44px;
   }
 
   .leaderboard h2 {
