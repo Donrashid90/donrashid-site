@@ -185,6 +185,47 @@
   line-height: 1;
 }
 
+.level-strip {
+  display: grid;
+  grid-template-columns: auto minmax(120px, 1fr) auto;
+  align-items: center;
+  gap: 18px;
+  min-height: 42px;
+  padding: 10px 22px;
+  border-bottom: 1px solid var(--line);
+  background: #090a0c;
+}
+
+.level-number,
+.level-map {
+  color: var(--gold-light);
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: .17em;
+  text-transform: uppercase;
+}
+
+.level-map {
+  color: var(--ink-faint);
+  text-align: right;
+}
+
+.level-track {
+  position: relative;
+  height: 3px;
+  overflow: hidden;
+  background: rgba(243, 240, 233, .1);
+}
+
+.level-track i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0;
+  background: linear-gradient(90deg, #3aa8ae, var(--gold-light));
+  box-shadow: 0 0 15px rgba(203, 162, 91, .46);
+  transition: width .16s linear;
+}
+
 .hud-live {
   display: inline-flex;
   align-items: center;
@@ -279,6 +320,11 @@
   text-transform: uppercase;
 }
 
+.game-overlay h2 em {
+  color: var(--gold-light);
+  font-style: normal;
+}
+
 .game-overlay > p:not(.overlay-kicker) {
   width: min(490px, 100%);
   color: rgba(243, 240, 233, .64);
@@ -312,13 +358,95 @@
   transform: translateY(-2px);
 }
 
-.game-overlay small {
+.overlay-control-hint {
   margin-top: 12px;
   color: rgba(243, 240, 233, .32);
   font-size: 7px;
   font-weight: 700;
   letter-spacing: .15em;
   text-transform: uppercase;
+}
+
+.promo-reward {
+  width: min(520px, 100%);
+  margin-top: 17px;
+  padding: 14px 16px;
+  border: 1px solid rgba(237, 212, 152, .48);
+  background:
+    linear-gradient(120deg, rgba(203, 162, 91, .13), transparent 55%),
+    rgba(5, 6, 7, .9);
+}
+
+.promo-reward[hidden] {
+  display: none;
+}
+
+.promo-reward-kicker,
+.promo-reward small {
+  display: block;
+  color: var(--gold-light);
+  font-size: 7px;
+  font-weight: 800;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+
+.promo-reward-code {
+  display: block;
+  margin-top: 6px;
+  color: var(--ink);
+  font-family: var(--display);
+  font-size: clamp(20px, 3vw, 34px);
+  letter-spacing: .08em;
+}
+
+.promo-reward > p {
+  margin-top: 5px;
+  color: var(--ink-faint);
+  font-size: 9px;
+}
+
+.promo-reward-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 11px;
+}
+
+.promo-reward-actions button,
+.promo-reward-actions a {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--gold-light);
+  background: var(--gold-light);
+  color: #070708;
+  font-size: 7px;
+  font-weight: 800;
+  letter-spacing: .15em;
+  text-decoration: none;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.promo-reward-actions a {
+  justify-content: space-between;
+  padding: 0 13px;
+  background: transparent;
+  color: var(--gold-light);
+}
+
+.promo-reward-actions button:disabled {
+  opacity: .45;
+  cursor: wait;
+}
+
+.promo-reward small {
+  margin-top: 9px;
+  color: rgba(243, 240, 233, .4);
+  font-size: 6px;
+  letter-spacing: .12em;
 }
 
 .game-announcement {
@@ -613,6 +741,20 @@
   border-bottom: 1px solid var(--line);
 }
 
+.leaderboard-player {
+  min-width: 0;
+}
+
+.leaderboard-level {
+  display: block;
+  margin-top: 3px;
+  color: var(--ink-faint);
+  font-size: 7px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
 .leaderboard-list li::before {
   content: counter(boulevard-rank, decimal-leading-zero);
   color: var(--gold);
@@ -810,6 +952,22 @@
     display: none;
   }
 
+  .level-strip {
+    grid-template-columns: auto 1fr;
+    gap: 9px 12px;
+    min-height: 46px;
+    padding: 9px 13px;
+  }
+
+  .level-track {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .level-map {
+    font-size: 6px;
+  }
+
   .game-hud strong {
     font-size: 18px;
   }
@@ -823,15 +981,12 @@
   }
 
   .overlay-mark {
-    width: 31px;
-    height: 31px;
-    margin-bottom: 8px;
-    font-size: 8px;
+    display: none;
   }
 
   .game-overlay h2 {
-    margin: 7px 0 8px;
-    font-size: clamp(31px, 11vw, 49px);
+    margin: 5px 0 7px;
+    font-size: clamp(27px, 9vw, 42px);
   }
 
   .game-overlay > p:not(.overlay-kicker) {
@@ -842,13 +997,36 @@
 
   .game-start {
     min-width: 176px;
-    min-height: 40px;
-    margin-top: 12px;
+    min-height: 38px;
+    margin-top: 9px;
     font-size: 7px;
   }
 
-  .game-overlay small {
+  .overlay-control-hint {
     display: none;
+  }
+
+  .game-canvas-shell.has-reward {
+    min-height: 385px;
+  }
+
+  .game-canvas-shell.has-reward .game-overlay {
+    justify-content: flex-start;
+    padding-top: 16px;
+    overflow-y: auto;
+  }
+
+  .game-canvas-shell.has-reward .game-overlay h2 {
+    font-size: 30px;
+  }
+
+  .promo-reward {
+    margin-top: 10px;
+    padding: 11px;
+  }
+
+  .promo-reward-code {
+    font-size: 20px;
   }
 
   .game-controls {

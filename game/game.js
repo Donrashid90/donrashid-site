@@ -10,8 +10,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const pauseButton = document.getElementById("pauseButton");
   const scoreValue = document.getElementById("scoreValue");
   const bestValue = document.getElementById("bestValue");
+  const levelValue = document.getElementById("levelValue");
+  const levelMap = document.getElementById("levelMap");
+  const levelProgress = document.getElementById("levelProgress");
   const runStatus = document.getElementById("runStatus");
   const announcement = document.getElementById("gameAnnouncement");
+  const promoReward = document.getElementById("promoReward");
+  const promoCode = document.getElementById("promoCode");
+  const promoRewardStatus = document.getElementById("promoRewardStatus");
+  const copyPromoButton = document.getElementById("copyPromoButton");
+  const promoShopLink = document.getElementById("promoShopLink");
   const scoreEntry = document.getElementById("scoreEntry");
   const scoreName = document.getElementById("scoreName");
   const scoreSubmit = document.getElementById("scoreSubmit");
@@ -31,14 +39,97 @@ document.addEventListener("DOMContentLoaded", () => {
   const ROAD_TOP = 370;
   const GROUND_Y = 414;
   const GRAVITY = 1100;
-  const HYDRAULIC_IMPULSE = -620;
+  const LEVEL_DURATION = 21;
   const STORAGE_KEY = "don-rashid-lowrider-night-run-best-v1";
   const NICKNAME_KEY = "don-rashid-lowrider-night-run-nickname-v1";
+  const DEVICE_KEY = "don-rashid-lowrider-night-run-device-v1";
   const LEADERBOARD_API = leaderboardRoot?.dataset.apiUrl || "";
+
+  const LEVELS = [
+    {
+      number: 1,
+      name: "Midnight Boulevard",
+      upgrade: "Factory frame / street chrome",
+      baseSpeed: 285,
+      maxSpeed: 355,
+      acceleration: 3.4,
+      spawnMin: 1.3,
+      spawnRange: .72,
+      jumpImpulse: -620,
+      map: "boulevard",
+      sky: ["#05070b", "#0b1b20", "#12363a", "#090b0d"],
+      accent: "#49b8bd",
+      vehicle: { top: "#242a2d", middle: "#111417", bottom: "#08090b", trim: "#edd498", glow: "#38bbc3", wheel: "#c7cecb", spokes: 8 },
+    },
+    {
+      number: 2,
+      name: "Neon Harbor",
+      upgrade: "Chrome wire wheels unlocked",
+      baseSpeed: 325,
+      maxSpeed: 395,
+      acceleration: 3.8,
+      spawnMin: 1.23,
+      spawnRange: .66,
+      jumpImpulse: -632,
+      map: "harbor",
+      sky: ["#050611", "#101638", "#133b48", "#080a12"],
+      accent: "#51cbd1",
+      vehicle: { top: "#30424b", middle: "#13242c", bottom: "#071015", trim: "#d8e4e4", glow: "#42d9df", wheel: "#eef4f2", spokes: 10 },
+    },
+    {
+      number: 3,
+      name: "Desert Interstate",
+      upgrade: "Hydraulics Stage II unlocked",
+      baseSpeed: 360,
+      maxSpeed: 430,
+      acceleration: 4.1,
+      spawnMin: 1.17,
+      spawnRange: .59,
+      jumpImpulse: -645,
+      map: "desert",
+      sky: ["#10080d", "#341725", "#6b382d", "#160d10"],
+      accent: "#e99b63",
+      vehicle: { top: "#63332b", middle: "#311615", bottom: "#0e090a", trim: "#f0c075", glow: "#dc6945", wheel: "#e8c5a2", spokes: 10 },
+    },
+    {
+      number: 4,
+      name: "Downtown Pressure",
+      upgrade: "Neon performance kit unlocked",
+      baseSpeed: 395,
+      maxSpeed: 465,
+      acceleration: 4.4,
+      spawnMin: 1.11,
+      spawnRange: .53,
+      jumpImpulse: -655,
+      map: "downtown",
+      sky: ["#07050f", "#1c0d2d", "#172f45", "#07090e"],
+      accent: "#d55ee9",
+      vehicle: { top: "#382245", middle: "#1c1025", bottom: "#09070d", trim: "#df8cf0", glow: "#c84ee4", wheel: "#e6d8ec", spokes: 12 },
+    },
+    {
+      number: 5,
+      name: "Golden Coast",
+      upgrade: "Black-gold crown build",
+      baseSpeed: 430,
+      maxSpeed: 495,
+      acceleration: 4.7,
+      spawnMin: 1.05,
+      spawnRange: .46,
+      jumpImpulse: -665,
+      map: "golden",
+      sky: ["#080705", "#21170c", "#634421", "#0c0906"],
+      accent: "#edd498",
+      vehicle: { top: "#332a1d", middle: "#15110c", bottom: "#050504", trim: "#f4d58b", glow: "#d6a742", wheel: "#f1d48f", spokes: 12 },
+    },
+  ];
+
+  const FINAL_LEVEL = LEVELS.length;
 
   let mode = "idle";
   let lastTime = 0;
   let elapsed = 0;
+  let levelElapsed = 0;
+  let currentLevel = 1;
   let distance = 0;
   let score = 0;
   let speed = 285;
@@ -53,6 +144,8 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentRunPromise = Promise.resolve(null);
   let qualifiedScore = null;
   let qualifiedDurationMs = null;
+  let qualifiedLevel = 1;
+  let levelCheckpointPromise = Promise.resolve(null);
 
   const player = {
     x: 142,
@@ -114,6 +207,35 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  function getDeviceId() {
+    try {
+      const stored = localStorage.getItem(DEVICE_KEY);
+      if (stored) return stored;
+      const id = crypto.randomUUID();
+      localStorage.setItem(DEVICE_KEY, id);
+      return id;
+    } catch (error) {
+      return crypto.randomUUID();
+    }
+  }
+
+  function getLevelConfig() {
+    return LEVELS[Math.max(0, Math.min(FINAL_LEVEL - 1, currentLevel - 1))];
+  }
+
+  function resetPromoReward() {
+    if (promoReward) promoReward.hidden = true;
+    if (promoCode) promoCode.textContent = "UNLOCKING…";
+    if (promoRewardStatus) promoRewardStatus.textContent = "Verifying your completed run.";
+    if (copyPromoButton) {
+      copyPromoButton.disabled = true;
+      copyPromoButton.textContent = "Copy code";
+      copyPromoButton.dataset.code = "";
+    }
+    if (promoShopLink) promoShopLink.href = "https://shop.donrashid.com";
+    canvasShell.classList.remove("has-reward");
+  }
+
   function setLeaderboardStatus(message = "", isError = false) {
     if (!leaderboardStatus) return;
     leaderboardStatus.textContent = message;
@@ -140,13 +262,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
     scores.forEach((entry) => {
       const item = document.createElement("li");
+      const playerInfo = document.createElement("span");
       const name = document.createElement("span");
+      const level = document.createElement("small");
       const points = document.createElement("strong");
+      playerInfo.className = "leaderboard-player";
       name.className = "leaderboard-name";
+      level.className = "leaderboard-level";
       points.className = "leaderboard-score";
       name.textContent = entry.name;
+      level.textContent = `Level ${Math.max(1, Math.min(FINAL_LEVEL, Number(entry.level) || 1))}`;
       points.textContent = formatScore(entry.score);
-      item.append(name, points);
+      playerInfo.append(name, level);
+      item.append(playerInfo, points);
       leaderboardList.append(item);
     });
   }
@@ -206,9 +334,106 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  async function reportLevelCheckpoint(completedLevel, sequence) {
+    const runId = await currentRunPromise;
+    if (!runId || sequence !== runSequence) return null;
+
+    try {
+      return await requestLeaderboard({
+        method: "POST",
+        body: JSON.stringify({
+          action: "checkpoint",
+          runId,
+          level: completedLevel,
+          score: Math.floor(score),
+          durationMs: Math.floor(elapsed * 1000),
+        }),
+      });
+    } catch (error) {
+      return null;
+    }
+  }
+
+  async function claimLevelReward(sequence) {
+    if (!promoReward || !promoCode || !promoRewardStatus || !copyPromoButton) return;
+    promoReward.hidden = false;
+    canvasShell.classList.add("has-reward");
+    resizeCanvas();
+
+    const [runId, checkpoint] = await Promise.all([
+      currentRunPromise,
+      levelCheckpointPromise,
+    ]);
+
+    if (!runId || !checkpoint || sequence !== runSequence) {
+      promoCode.textContent = "NOT VERIFIED";
+      promoRewardStatus.textContent = "The reward server could not verify this run. Your score still counts.";
+      return;
+    }
+
+    try {
+      const payload = await requestLeaderboard({
+        method: "POST",
+        body: JSON.stringify({
+          action: "reward",
+          runId,
+          deviceId: getDeviceId(),
+          score: Math.floor(score),
+          durationMs: Math.floor(elapsed * 1000),
+        }),
+      });
+
+      if (sequence !== runSequence || typeof payload.code !== "string") return;
+      promoCode.textContent = payload.code;
+      promoRewardStatus.textContent = payload.returning
+        ? "Your previously unlocked one-time code is ready."
+        : "You cleared all five levels. Your one-time code is ready.";
+      copyPromoButton.dataset.code = payload.code;
+      copyPromoButton.disabled = false;
+      if (promoShopLink && typeof payload.promoUrl === "string") {
+        try {
+          const rewardUrl = new URL(payload.promoUrl);
+          if (rewardUrl.protocol === "https:" && rewardUrl.hostname === "shop.donrashid.com") {
+            promoShopLink.href = rewardUrl.href;
+          }
+        } catch (error) {
+          // The copyable code remains available if a malformed shop URL is returned.
+        }
+      }
+    } catch (error) {
+      promoCode.textContent = "REWARD UNAVAILABLE";
+      promoRewardStatus.textContent = error instanceof Error
+        ? error.message
+        : "The limited reward could not be issued right now.";
+    }
+  }
+
+  async function copyPromoCode() {
+    if (!copyPromoButton) return;
+    const code = copyPromoButton.dataset.code || "";
+    if (!code) return;
+
+    try {
+      await navigator.clipboard.writeText(code);
+      copyPromoButton.textContent = "Copied ✓";
+    } catch (error) {
+      const input = document.createElement("textarea");
+      input.value = code;
+      input.setAttribute("readonly", "");
+      input.style.position = "fixed";
+      input.style.opacity = "0";
+      document.body.append(input);
+      input.select();
+      document.execCommand("copy");
+      input.remove();
+      copyPromoButton.textContent = "Copied ✓";
+    }
+  }
+
   function resetScoreEntry() {
     qualifiedScore = null;
     qualifiedDurationMs = null;
+    qualifiedLevel = 1;
     if (scoreEntry) scoreEntry.hidden = true;
     if (scoreName) {
       scoreName.disabled = false;
@@ -221,13 +446,14 @@ document.addEventListener("DOMContentLoaded", () => {
     setScoreEntryStatus();
   }
 
-  async function offerWorldwideScore(finalScore, durationMs, sequence) {
-    const [runId, boardAvailable] = await Promise.all([
+  async function offerWorldwideScore(finalScore, durationMs, finalLevel, sequence) {
+    const [runId, , boardAvailable] = await Promise.all([
       currentRunPromise,
+      levelCheckpointPromise,
       loadLeaderboard(false)
     ]);
 
-    if (sequence !== runSequence || mode !== "gameover") return;
+    if (sequence !== runSequence || !["gameover", "victory"].includes(mode)) return;
     if (!runId || !boardAvailable || durationMs < 1500) return;
 
     const lastPlace = leaderboardScores[9];
@@ -236,6 +462,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     qualifiedScore = finalScore;
     qualifiedDurationMs = durationMs;
+    qualifiedLevel = finalLevel;
     if (scoreEntry) scoreEntry.hidden = false;
     if (overlayKicker) overlayKicker.textContent = "Boulevard Top 10";
     if (overlayText) overlayText.textContent = "Enter a public nickname below to put this run on the worldwide board.";
@@ -249,6 +476,13 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateHud() {
     if (scoreValue) scoreValue.textContent = formatScore(score);
     if (bestValue) bestValue.textContent = formatScore(best);
+    const level = getLevelConfig();
+    if (levelValue) levelValue.textContent = `Level ${currentLevel} / ${FINAL_LEVEL}`;
+    if (levelMap) levelMap.textContent = level.name;
+    if (levelProgress) {
+      const progress = mode === "victory" ? 1 : Math.max(0, Math.min(1, levelElapsed / LEVEL_DURATION));
+      levelProgress.style.width = `${Math.round(progress * 100)}%`;
+    }
   }
 
   function resizeCanvas() {
@@ -260,6 +494,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function setOverlay({ kicker, title, text, button }) {
+    resetPromoReward();
     if (overlayKicker) overlayKicker.textContent = kicker;
     if (overlayTitle) overlayTitle.innerHTML = title;
     if (overlayText) overlayText.textContent = text;
@@ -286,32 +521,98 @@ document.addEventListener("DOMContentLoaded", () => {
     player.compression = 0;
   }
 
-  function startGame() {
-    runSequence += 1;
-    const sequence = runSequence;
+  function startCurrentLevel() {
+    const level = getLevelConfig();
     mode = "running";
     lastTime = performance.now();
-    elapsed = 0;
-    distance = 0;
-    score = 0;
-    speed = 285;
-    obstacleClock = 1.15;
-    pickupClock = 1.75;
+    levelElapsed = 0;
+    speed = level.baseSpeed;
+    obstacleClock = 1.05;
+    pickupClock = 1.55;
     obstacles.length = 0;
     pickups.length = 0;
     particles.length = 0;
-    resetScoreEntry();
     resetPlayer();
     hideOverlay();
     if (pauseButton) {
       pauseButton.disabled = false;
       pauseButton.textContent = "Pause";
     }
-    if (runStatus) runStatus.textContent = "Night run in progress";
+    if (runStatus) runStatus.textContent = `Level ${currentLevel} — ${level.name}`;
     updateHud();
-    currentRunPromise = beginVerifiedRun(sequence);
+    resizeCanvas();
     cancelAnimationFrame(animationFrame);
     animationFrame = requestAnimationFrame(loop);
+  }
+
+  function startGame() {
+    runSequence += 1;
+    const sequence = runSequence;
+    elapsed = 0;
+    levelElapsed = 0;
+    currentLevel = 1;
+    distance = 0;
+    score = 0;
+    resetScoreEntry();
+    resetPromoReward();
+    levelCheckpointPromise = Promise.resolve(null);
+    currentRunPromise = beginVerifiedRun(sequence);
+    startCurrentLevel();
+  }
+
+  function completeLevel() {
+    if (mode !== "running") return;
+    const completedLevel = currentLevel;
+    const completedConfig = getLevelConfig();
+    const sequence = runSequence;
+    score += 500 * completedLevel;
+    obstacles.length = 0;
+    pickups.length = 0;
+    mode = "levelcomplete";
+    levelCheckpointPromise = levelCheckpointPromise.then(() => reportLevelCheckpoint(completedLevel, sequence));
+
+    if (pauseButton) pauseButton.disabled = true;
+
+    if (completedLevel < FINAL_LEVEL) {
+      currentLevel += 1;
+      levelElapsed = 0;
+      const nextLevel = getLevelConfig();
+      if (runStatus) runStatus.textContent = `Upgrade unlocked — ${completedConfig.upgrade}`;
+      setOverlay({
+        kicker: `Level ${completedLevel} complete / Upgrade installed`,
+        title: `LEVEL ${currentLevel}<br /><em>${nextLevel.name.replace(" ", "<br />")}</em>`,
+        text: `${completedConfig.upgrade}. The next district is faster and less forgiving.`,
+        button: `Start Level ${currentLevel}`,
+      });
+      updateHud();
+      drawScene();
+      return;
+    }
+
+    finishVictory(sequence);
+  }
+
+  function finishVictory(sequence) {
+    mode = "victory";
+    const finalScore = Math.floor(score);
+    const finalDurationMs = Math.floor(elapsed * 1000);
+    const isNewBest = finalScore > best;
+    if (isNewBest) {
+      best = finalScore;
+      saveBest(best);
+    }
+    if (pauseButton) pauseButton.disabled = true;
+    if (runStatus) runStatus.textContent = "All five levels complete — reward unlocked";
+    setOverlay({
+      kicker: "Level 5 complete / Coast conquered",
+      title: "YOU OWN<br /><em>THE COAST</em>",
+      text: `${formatScore(finalScore)} points. Your limited shop reward is being verified.`,
+      button: "Run it back",
+    });
+    updateHud();
+    drawScene();
+    void claimLevelReward(sequence);
+    void offerWorldwideScore(finalScore, finalDurationMs, FINAL_LEVEL, sequence);
   }
 
   function endGame() {
@@ -329,12 +630,12 @@ document.addEventListener("DOMContentLoaded", () => {
     if (pauseButton) pauseButton.disabled = true;
     if (runStatus) runStatus.textContent = isNewBest ? "New boulevard record" : "Run ended — chrome reset";
     setOverlay({
-      kicker: isNewBest ? "New high score" : "Run complete",
+      kicker: isNewBest ? `Level ${currentLevel} / New high score` : `Level ${currentLevel} / Run ended`,
       title: `${formatScore(finalScore)}<br />${isNewBest ? "NEW RECORD" : "TRY AGAIN"}`,
       text: isNewBest ? "The boulevard has a new number to beat." : "One clean jump can change the whole night.",
       button: "Run it back"
     });
-    void offerWorldwideScore(finalScore, finalDurationMs, finishedRunSequence);
+    void offerWorldwideScore(finalScore, finalDurationMs, currentLevel, finishedRunSequence);
   }
 
   async function submitWorldwideScore(event) {
@@ -357,7 +658,8 @@ document.addEventListener("DOMContentLoaded", () => {
           runId: currentRunId,
           name: nickname,
           score: qualifiedScore,
-          durationMs: qualifiedDurationMs
+          durationMs: qualifiedDurationMs,
+          level: qualifiedLevel,
         })
       });
 
@@ -403,7 +705,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!player.grounded) return;
 
     player.grounded = false;
-    player.vy = HYDRAULIC_IMPULSE;
+    const level = getLevelConfig();
+    player.vy = level.jumpImpulse;
     player.compression = 1;
     player.tilt = -.055;
 
@@ -415,7 +718,7 @@ document.addEventListener("DOMContentLoaded", () => {
         vy: -18 - Math.random() * 55,
         life: .35 + Math.random() * .35,
         maxLife: .7,
-        color: index % 3 === 0 ? "#cba25b" : "#46aeb3"
+        color: index % 3 === 0 ? "#cba25b" : level.accent
       });
     }
 
@@ -476,9 +779,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function update(dt) {
     elapsed += dt;
-    speed = Math.min(515, 285 + elapsed * 6.1);
+    levelElapsed += dt;
+    const level = getLevelConfig();
+    speed = Math.min(level.maxSpeed, level.baseSpeed + levelElapsed * level.acceleration);
     distance += speed * dt;
-    score += dt * (25 + speed * .035);
+    score += dt * (24 + speed * .04 + currentLevel * 2.5);
 
     player.vy += GRAVITY * dt;
     player.y += player.vy * dt;
@@ -509,8 +814,7 @@ document.addEventListener("DOMContentLoaded", () => {
     obstacleClock -= dt;
     if (obstacleClock <= 0) {
       spawnObstacle();
-      const difficulty = Math.min(.55, elapsed / 115);
-      obstacleClock = 1.35 + Math.random() * (1.05 - difficulty);
+      obstacleClock = level.spawnMin + Math.random() * level.spawnRange;
     }
 
     pickupClock -= dt;
@@ -593,6 +897,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     updateHud();
+    if (levelElapsed >= LEVEL_DURATION) completeLevel();
   }
 
   function pathRoundRect(context, x, y, width, height, radius) {
@@ -607,29 +912,37 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function drawSky() {
+    const level = getLevelConfig();
     const sky = ctx.createLinearGradient(0, 0, 0, VIEW_H);
-    sky.addColorStop(0, "#05070b");
-    sky.addColorStop(.48, "#0b1b20");
-    sky.addColorStop(.75, "#12363a");
-    sky.addColorStop(1, "#090b0d");
+    sky.addColorStop(0, level.sky[0]);
+    sky.addColorStop(.48, level.sky[1]);
+    sky.addColorStop(.75, level.sky[2]);
+    sky.addColorStop(1, level.sky[3]);
     ctx.fillStyle = sky;
     ctx.fillRect(0, 0, VIEW_W, VIEW_H);
 
-    const glow = ctx.createRadialGradient(755, 145, 8, 755, 145, 155);
-    glow.addColorStop(0, "rgba(237, 212, 152, .22)");
-    glow.addColorStop(.18, "rgba(203, 162, 91, .1)");
+    const celestialX = level.map === "desert" ? 720 : level.map === "golden" ? 790 : 755;
+    const celestialY = level.map === "golden" ? 205 : 145;
+    const glow = ctx.createRadialGradient(celestialX, celestialY, 8, celestialX, celestialY, level.map === "golden" ? 220 : 155);
+    glow.addColorStop(0, level.map === "downtown" ? "rgba(214, 94, 233, .2)" : "rgba(237, 212, 152, .25)");
+    glow.addColorStop(.2, level.map === "desert" ? "rgba(226, 115, 68, .14)" : "rgba(203, 162, 91, .1)");
     glow.addColorStop(1, "rgba(203, 162, 91, 0)");
     ctx.fillStyle = glow;
-    ctx.fillRect(575, 0, 360, 320);
+    ctx.fillRect(celestialX - 220, 0, 440, 390);
 
-    ctx.fillStyle = "rgba(237, 212, 152, .82)";
+    ctx.fillStyle = level.map === "desert"
+      ? "rgba(242, 139, 79, .84)"
+      : level.map === "downtown"
+        ? "rgba(218, 163, 234, .74)"
+        : "rgba(237, 212, 152, .82)";
     ctx.beginPath();
-    ctx.arc(755, 145, 24, 0, Math.PI * 2);
+    ctx.arc(celestialX, celestialY, level.map === "golden" ? 38 : 24, 0, Math.PI * 2);
     ctx.fill();
 
     stars.forEach((star) => {
       const twinkle = .72 + Math.sin(elapsed * 1.3 + star.x) * .28;
-      ctx.globalAlpha = star.alpha * twinkle;
+      const visibility = ["desert", "golden"].includes(level.map) ? .68 : 1;
+      ctx.globalAlpha = star.alpha * twinkle * visibility;
       ctx.fillStyle = "#f3f0e9";
       ctx.beginPath();
       ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
@@ -705,9 +1018,165 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  function drawHarbor() {
+    const offset = -((distance * .12) % 620);
+    ctx.fillStyle = "rgba(5, 12, 20, .9)";
+    ctx.fillRect(0, 328, VIEW_W, 44);
+
+    for (let repeat = -1; repeat < 4; repeat += 1) {
+      const baseX = offset + repeat * 620;
+      ctx.fillStyle = "rgba(6, 10, 17, .92)";
+      ctx.fillRect(baseX + 25, 292, 168, 77);
+      ctx.fillRect(baseX + 218, 316, 106, 53);
+      ctx.fillRect(baseX + 338, 303, 132, 66);
+
+      ctx.strokeStyle = "rgba(4, 8, 13, .96)";
+      ctx.lineWidth = 8;
+      ctx.beginPath();
+      ctx.moveTo(baseX + 95, 292);
+      ctx.lineTo(baseX + 95, 150);
+      ctx.lineTo(baseX + 245, 150);
+      ctx.moveTo(baseX + 95, 175);
+      ctx.lineTo(baseX + 205, 265);
+      ctx.stroke();
+
+      ctx.strokeStyle = "rgba(73, 184, 189, .34)";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(baseX + 35, 303, 64, 28);
+      ctx.strokeRect(baseX + 105, 303, 74, 28);
+      ctx.strokeRect(baseX + 228, 326, 84, 27);
+    }
+
+    ctx.fillStyle = "rgba(73, 184, 189, .08)";
+    ctx.fillRect(0, 345, VIEW_W, 25);
+  }
+
+  function drawCactus(x, y, scale = 1) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(scale, scale);
+    ctx.strokeStyle = "rgba(7, 12, 10, .88)";
+    ctx.lineWidth = 10;
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(0, -73);
+    ctx.moveTo(0, -43);
+    ctx.lineTo(-19, -43);
+    ctx.lineTo(-19, -60);
+    ctx.moveTo(0, -29);
+    ctx.lineTo(21, -29);
+    ctx.lineTo(21, -50);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawDesert() {
+    const mountainOffset = -((distance * .045) % 1120);
+    ctx.fillStyle = "rgba(25, 12, 17, .72)";
+    for (let repeat = -1; repeat < 3; repeat += 1) {
+      const x = mountainOffset + repeat * 1120;
+      ctx.beginPath();
+      ctx.moveTo(x - 120, ROAD_TOP);
+      ctx.lineTo(x + 110, 218);
+      ctx.lineTo(x + 280, ROAD_TOP);
+      ctx.lineTo(x + 470, 265);
+      ctx.lineTo(x + 690, ROAD_TOP);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    const cactusOffset = -((distance * .17) % 670);
+    for (let repeat = -1; repeat < 4; repeat += 1) {
+      drawCactus(cactusOffset + repeat * 670 + 180, ROAD_TOP + 3, .82);
+      drawCactus(cactusOffset + repeat * 670 + 515, ROAD_TOP + 3, .55);
+    }
+  }
+
+  function drawDowntownNeon() {
+    const offset = -((distance * .1) % 820);
+    const signs = [
+      { x: 94, y: 222, text: "DR", color: "#d55ee9" },
+      { x: 342, y: 264, text: "3072", color: "#49b8bd" },
+      { x: 622, y: 204, text: "NIGHT", color: "#edd498" },
+    ];
+
+    for (let repeat = -1; repeat < 3; repeat += 1) {
+      signs.forEach((sign) => {
+        const x = offset + repeat * 820 + sign.x;
+        ctx.save();
+        ctx.shadowColor = sign.color;
+        ctx.shadowBlur = 16;
+        ctx.strokeStyle = sign.color;
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(x, sign.y, 72, 30);
+        ctx.fillStyle = sign.color;
+        ctx.font = "700 11px Space Grotesk, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(sign.text, x + 36, sign.y + 19);
+        ctx.restore();
+      });
+    }
+  }
+
+  function drawGoldenCoast() {
+    const horizon = 310;
+    const ocean = ctx.createLinearGradient(0, horizon, 0, ROAD_TOP);
+    ocean.addColorStop(0, "rgba(224, 170, 74, .2)");
+    ocean.addColorStop(1, "rgba(5, 11, 14, .8)");
+    ctx.fillStyle = ocean;
+    ctx.fillRect(0, horizon, VIEW_W, ROAD_TOP - horizon);
+
+    ctx.strokeStyle = "rgba(237, 212, 152, .19)";
+    ctx.lineWidth = 1;
+    for (let row = 0; row < 4; row += 1) {
+      const waveOffset = -((distance * (.04 + row * .01)) % 180);
+      for (let x = waveOffset - 180; x < VIEW_W + 180; x += 180) {
+        ctx.beginPath();
+        ctx.moveTo(x, horizon + 13 + row * 12);
+        ctx.quadraticCurveTo(x + 45, horizon + 7 + row * 12, x + 90, horizon + 13 + row * 12);
+        ctx.stroke();
+      }
+    }
+
+    const pierOffset = -((distance * .11) % 760);
+    for (let repeat = -1; repeat < 3; repeat += 1) {
+      const x = pierOffset + repeat * 760 + 410;
+      ctx.fillStyle = "rgba(7, 7, 7, .88)";
+      ctx.fillRect(x, 278, 214, 10);
+      ctx.fillRect(x + 18, 288, 7, 82);
+      ctx.fillRect(x + 176, 288, 7, 82);
+      drawPalm(x + 95, ROAD_TOP + 4, .72);
+    }
+  }
+
+  function drawBackdrop() {
+    const map = getLevelConfig().map;
+    if (map === "boulevard") {
+      drawSkyline();
+      drawPalms();
+      return;
+    }
+    if (map === "harbor") {
+      drawHarbor();
+      return;
+    }
+    if (map === "desert") {
+      drawDesert();
+      return;
+    }
+    if (map === "downtown") {
+      drawSkyline();
+      drawDowntownNeon();
+      return;
+    }
+    drawGoldenCoast();
+  }
+
   function drawRoad() {
+    const level = getLevelConfig();
     const road = ctx.createLinearGradient(0, ROAD_TOP, 0, VIEW_H);
-    road.addColorStop(0, "#14191b");
+    road.addColorStop(0, level.map === "desert" ? "#241917" : level.map === "golden" ? "#211a10" : "#14191b");
     road.addColorStop(.45, "#090b0d");
     road.addColorStop(1, "#050607");
     ctx.fillStyle = road;
@@ -717,7 +1186,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ctx.fillRect(0, ROAD_TOP + 3, VIEW_W, 1);
 
     const laneOffset = -((distance * 1.04) % 170);
-    ctx.fillStyle = "rgba(237, 212, 152, .3)";
+    ctx.fillStyle = level.map === "downtown" ? "rgba(213, 94, 233, .28)" : "rgba(237, 212, 152, .3)";
     for (let x = laneOffset - 170; x < VIEW_W + 170; x += 170) {
       ctx.save();
       ctx.transform(1, 0, -.2, 1, 0, 0);
@@ -726,8 +1195,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const reflection = ctx.createLinearGradient(0, ROAD_TOP, 0, VIEW_H);
-    reflection.addColorStop(0, "rgba(44, 150, 158, .1)");
-    reflection.addColorStop(1, "rgba(44, 150, 158, 0)");
+    reflection.addColorStop(0, `${level.accent}1f`);
+    reflection.addColorStop(1, `${level.accent}00`);
     ctx.fillStyle = reflection;
     ctx.fillRect(0, ROAD_TOP, VIEW_W, VIEW_H - ROAD_TOP);
 
@@ -880,6 +1349,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function drawWheel(x, y, radius, rotation) {
+    const level = getLevelConfig();
+    const vehicle = level.vehicle;
     ctx.save();
     ctx.translate(x, y);
     ctx.rotate(rotation);
@@ -887,19 +1358,19 @@ document.addEventListener("DOMContentLoaded", () => {
     ctx.beginPath();
     ctx.arc(0, 0, radius, 0, Math.PI * 2);
     ctx.fill();
-    ctx.strokeStyle = "#aeb5b3";
+    ctx.strokeStyle = vehicle.wheel;
     ctx.lineWidth = 3;
     ctx.beginPath();
     ctx.arc(0, 0, radius - 5, 0, Math.PI * 2);
     ctx.stroke();
-    ctx.fillStyle = "#c7cecb";
+    ctx.fillStyle = vehicle.wheel;
     ctx.beginPath();
     ctx.arc(0, 0, radius - 10, 0, Math.PI * 2);
     ctx.fill();
     ctx.strokeStyle = "#5b6262";
     ctx.lineWidth = 1.5;
-    for (let spoke = 0; spoke < 8; spoke += 1) {
-      ctx.rotate(Math.PI / 4);
+    for (let spoke = 0; spoke < vehicle.spokes; spoke += 1) {
+      ctx.rotate((Math.PI * 2) / vehicle.spokes);
       ctx.beginPath();
       ctx.moveTo(0, 0);
       ctx.lineTo(radius - 11, 0);
@@ -909,10 +1380,19 @@ document.addEventListener("DOMContentLoaded", () => {
     ctx.beginPath();
     ctx.arc(0, 0, 4, 0, Math.PI * 2);
     ctx.fill();
+    if (currentLevel >= 2) {
+      ctx.strokeStyle = currentLevel === FINAL_LEVEL ? vehicle.trim : "rgba(243, 240, 233, .72)";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(0, 0, radius - 8, 0, Math.PI * 2);
+      ctx.stroke();
+    }
     ctx.restore();
   }
 
   function drawLowrider() {
+    const level = getLevelConfig();
+    const vehicle = level.vehicle;
     const baseX = player.x;
     const baseY = 327 + player.y;
     const wheelRotation = distance * .035;
@@ -924,9 +1404,9 @@ document.addEventListener("DOMContentLoaded", () => {
     ctx.translate(-(baseX + 98), -(baseY + 52));
 
     const underglow = ctx.createRadialGradient(baseX + 102, baseY + 88, 8, baseX + 102, baseY + 88, 102);
-    underglow.addColorStop(0, "rgba(56, 187, 195, .4)");
-    underglow.addColorStop(.48, "rgba(40, 143, 151, .18)");
-    underglow.addColorStop(1, "rgba(40, 143, 151, 0)");
+    underglow.addColorStop(0, `${vehicle.glow}${currentLevel >= 4 ? "8c" : "66"}`);
+    underglow.addColorStop(.48, `${vehicle.glow}30`);
+    underglow.addColorStop(1, `${vehicle.glow}00`);
     ctx.fillStyle = underglow;
     ctx.fillRect(baseX - 20, baseY + 55, 245, 76);
 
@@ -934,9 +1414,9 @@ document.addEventListener("DOMContentLoaded", () => {
     drawWheel(baseX + 153, baseY + 76 - compression * .25, 25, wheelRotation);
 
     const bodyGradient = ctx.createLinearGradient(baseX, baseY + 22, baseX, baseY + 78);
-    bodyGradient.addColorStop(0, "#242a2d");
-    bodyGradient.addColorStop(.42, "#111417");
-    bodyGradient.addColorStop(1, "#08090b");
+    bodyGradient.addColorStop(0, vehicle.top);
+    bodyGradient.addColorStop(.42, vehicle.middle);
+    bodyGradient.addColorStop(1, vehicle.bottom);
     ctx.fillStyle = bodyGradient;
     ctx.beginPath();
     ctx.moveTo(baseX - 4, baseY + 43);
@@ -958,7 +1438,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ctx.closePath();
     ctx.fill();
 
-    ctx.strokeStyle = "rgba(237, 212, 152, .72)";
+    ctx.strokeStyle = vehicle.trim;
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(baseX + 5, baseY + 48);
@@ -984,10 +1464,33 @@ document.addEventListener("DOMContentLoaded", () => {
     ctx.lineTo(baseX + 120, baseY + 23);
     ctx.stroke();
 
-    ctx.fillStyle = "rgba(203, 162, 91, .92)";
+    ctx.fillStyle = vehicle.trim;
     ctx.font = "700 10px Space Grotesk, sans-serif";
     ctx.textAlign = "center";
     ctx.fillText("DR", baseX + 112, baseY + 49);
+
+    if (currentLevel >= 3) {
+      ctx.strokeStyle = `${vehicle.trim}b8`;
+      ctx.lineWidth = 1.25;
+      ctx.beginPath();
+      ctx.moveTo(baseX + 22, baseY + 58);
+      ctx.bezierCurveTo(baseX + 70, baseY + 50, baseX + 126, baseY + 67, baseX + 193, baseY + 55);
+      ctx.stroke();
+    }
+
+    if (currentLevel >= 4) {
+      ctx.fillStyle = `${vehicle.glow}b5`;
+      ctx.fillRect(baseX + 68, baseY + 74, 70, 2);
+    }
+
+    if (currentLevel === FINAL_LEVEL) {
+      ctx.strokeStyle = vehicle.trim;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(baseX + 80, baseY + 23);
+      ctx.lineTo(baseX + 153, baseY + 23);
+      ctx.stroke();
+    }
 
     ctx.fillStyle = "#d7dcd9";
     ctx.fillRect(baseX + 201, baseY + 40, 8, 5);
@@ -1034,8 +1537,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ctx.setTransform(scaleX, 0, 0, scaleY, 0, 0);
     ctx.clearRect(0, 0, VIEW_W, VIEW_H);
     drawSky();
-    drawSkyline();
-    drawPalms();
+    drawBackdrop();
     drawRoad();
     drawPickups();
     drawObstacles();
@@ -1055,7 +1557,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function handlePrimaryAction(event) {
     if (event) event.preventDefault();
-    if (mode === "idle" || mode === "gameover") startGame();
+    if (["idle", "gameover", "victory"].includes(mode)) startGame();
+    else if (mode === "levelcomplete") startCurrentLevel();
     else if (mode === "paused") togglePause();
     else triggerHydraulics();
   }
@@ -1066,6 +1569,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (pauseButton) pauseButton.addEventListener("click", togglePause);
   if (scoreEntry) scoreEntry.addEventListener("submit", submitWorldwideScore);
   if (leaderboardRefresh) leaderboardRefresh.addEventListener("click", () => void loadLeaderboard());
+  if (copyPromoButton) copyPromoButton.addEventListener("click", () => void copyPromoCode());
 
   document.addEventListener("keydown", (event) => {
     if (["Space", "ArrowUp", "KeyW"].includes(event.code)) {
@@ -1085,8 +1589,8 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("resize", resizeCanvas, { passive: true });
 
   resetScoreEntry();
+  resetPromoReward();
   updateHud();
   resizeCanvas();
-  drawScene();
   void loadLeaderboard(false);
 });
