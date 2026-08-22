@@ -56,6 +56,10 @@ document.addEventListener("DOMContentLoaded", () => {
       spawnMin: 1.3,
       spawnRange: .72,
       jumpImpulse: -620,
+      patternChance: 0,
+      trafficChance: 0,
+      callout: "CLEAN JUMPS",
+      challenge: "Single road hazards. Learn the clean jump.",
       map: "boulevard",
       sky: ["#05070b", "#0b1b20", "#12363a", "#090b0d"],
       accent: "#49b8bd",
@@ -65,12 +69,16 @@ document.addEventListener("DOMContentLoaded", () => {
       number: 2,
       name: "Neon Harbor",
       upgrade: "Chrome wire wheels unlocked",
-      baseSpeed: 325,
-      maxSpeed: 395,
-      acceleration: 3.8,
-      spawnMin: 1.23,
-      spawnRange: .66,
+      baseSpeed: 330,
+      maxSpeed: 410,
+      acceleration: 4,
+      spawnMin: 1.17,
+      spawnRange: .58,
       jumpImpulse: -632,
+      patternChance: .22,
+      trafficChance: 0,
+      callout: "PAIRED HAZARDS",
+      challenge: "Harbor rain and paired cones demand longer jumps.",
       map: "harbor",
       sky: ["#050611", "#101638", "#133b48", "#080a12"],
       accent: "#51cbd1",
@@ -80,12 +88,16 @@ document.addEventListener("DOMContentLoaded", () => {
       number: 3,
       name: "Desert Interstate",
       upgrade: "Hydraulics Stage II unlocked",
-      baseSpeed: 360,
-      maxSpeed: 430,
-      acceleration: 4.1,
-      spawnMin: 1.17,
-      spawnRange: .59,
+      baseSpeed: 370,
+      maxSpeed: 455,
+      acceleration: 4.35,
+      spawnMin: 1.08,
+      spawnRange: .5,
       jumpImpulse: -645,
+      patternChance: .34,
+      trafficChance: .05,
+      callout: "DUST COMBOS",
+      challenge: "Dust cuts visibility while mixed roadwork arrives in waves.",
       map: "desert",
       sky: ["#10080d", "#341725", "#6b382d", "#160d10"],
       accent: "#e99b63",
@@ -95,12 +107,16 @@ document.addEventListener("DOMContentLoaded", () => {
       number: 4,
       name: "Downtown Pressure",
       upgrade: "Neon performance kit unlocked",
-      baseSpeed: 395,
-      maxSpeed: 465,
-      acceleration: 4.4,
-      spawnMin: 1.11,
-      spawnRange: .53,
-      jumpImpulse: -655,
+      baseSpeed: 410,
+      maxSpeed: 500,
+      acceleration: 4.7,
+      spawnMin: 1,
+      spawnRange: .44,
+      jumpImpulse: -660,
+      patternChance: .47,
+      trafficChance: .18,
+      callout: "NEON TRAFFIC",
+      challenge: "Downtown traffic joins the lane and the timing window tightens.",
       map: "downtown",
       sky: ["#07050f", "#1c0d2d", "#172f45", "#07090e"],
       accent: "#d55ee9",
@@ -110,12 +126,16 @@ document.addEventListener("DOMContentLoaded", () => {
       number: 5,
       name: "Golden Coast",
       upgrade: "Black-gold crown build",
-      baseSpeed: 430,
-      maxSpeed: 495,
-      acceleration: 4.7,
-      spawnMin: 1.05,
-      spawnRange: .46,
-      jumpImpulse: -665,
+      baseSpeed: 450,
+      maxSpeed: 535,
+      acceleration: 5,
+      spawnMin: .94,
+      spawnRange: .4,
+      jumpImpulse: -675,
+      patternChance: .58,
+      trafficChance: .27,
+      callout: "TRIPLE WAVES",
+      challenge: "Triple obstacle waves guard the Golden Coast.",
       map: "golden",
       sky: ["#080705", "#21170c", "#634421", "#0c0906"],
       accent: "#edd498",
@@ -334,24 +354,30 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  async function reportLevelCheckpoint(completedLevel, sequence) {
+  async function reportLevelCheckpoint(completedLevel, sequence, checkpointScore, checkpointDurationMs) {
     const runId = await currentRunPromise;
     if (!runId || sequence !== runSequence) return null;
 
-    try {
-      return await requestLeaderboard({
-        method: "POST",
-        body: JSON.stringify({
-          action: "checkpoint",
-          runId,
-          level: completedLevel,
-          score: Math.floor(score),
-          durationMs: Math.floor(elapsed * 1000),
-        }),
-      });
-    } catch (error) {
-      return null;
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      try {
+        return await requestLeaderboard({
+          method: "POST",
+          body: JSON.stringify({
+            action: "checkpoint",
+            runId,
+            level: completedLevel,
+            score: checkpointScore,
+            durationMs: checkpointDurationMs,
+          }),
+        });
+      } catch (error) {
+        if (attempt === 0) {
+          await new Promise((resolve) => window.setTimeout(resolve, 250));
+        }
+      }
     }
+
+    return null;
   }
 
   async function claimLevelReward(sequence) {
@@ -462,7 +488,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     qualifiedScore = finalScore;
     qualifiedDurationMs = durationMs;
-    qualifiedLevel = finalLevel;
+    qualifiedLevel = Math.max(1, Math.min(FINAL_LEVEL, Number(finalLevel) || 1));
     if (scoreEntry) scoreEntry.hidden = false;
     if (overlayKicker) overlayKicker.textContent = "Boulevard Top 10";
     if (overlayText) overlayText.textContent = "Enter a public nickname below to put this run on the worldwide board.";
@@ -541,6 +567,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (runStatus) runStatus.textContent = `Level ${currentLevel} — ${level.name}`;
     updateHud();
     resizeCanvas();
+    showAnnouncement(`LEVEL ${currentLevel} · ${level.callout}`);
     cancelAnimationFrame(animationFrame);
     animationFrame = requestAnimationFrame(loop);
   }
@@ -566,10 +593,17 @@ document.addEventListener("DOMContentLoaded", () => {
     const completedConfig = getLevelConfig();
     const sequence = runSequence;
     score += 500 * completedLevel;
+    const checkpointScore = Math.floor(score);
+    const checkpointDurationMs = Math.floor(elapsed * 1000);
     obstacles.length = 0;
     pickups.length = 0;
     mode = "levelcomplete";
-    levelCheckpointPromise = levelCheckpointPromise.then(() => reportLevelCheckpoint(completedLevel, sequence));
+    levelCheckpointPromise = levelCheckpointPromise.then(() => reportLevelCheckpoint(
+      completedLevel,
+      sequence,
+      checkpointScore,
+      checkpointDurationMs,
+    ));
 
     if (pauseButton) pauseButton.disabled = true;
 
@@ -581,7 +615,7 @@ document.addEventListener("DOMContentLoaded", () => {
       setOverlay({
         kicker: `Level ${completedLevel} complete / Upgrade installed`,
         title: `LEVEL ${currentLevel}<br /><em>${nextLevel.name.replace(" ", "<br />")}</em>`,
-        text: `${completedConfig.upgrade}. The next district is faster and less forgiving.`,
+        text: `${completedConfig.upgrade}. ${nextLevel.challenge}`,
         button: `Start Level ${currentLevel}`,
       });
       updateHud();
@@ -667,7 +701,8 @@ document.addEventListener("DOMContentLoaded", () => {
       renderLeaderboard(leaderboardScores);
       saveNickname(nickname);
       scoreSubmit.textContent = "Saved ✓";
-      setScoreEntryStatus("Your score is now visible on the worldwide leaderboard.");
+      const savedLevel = Math.max(1, Math.min(FINAL_LEVEL, Number(payload.result?.level) || qualifiedLevel));
+      setScoreEntryStatus(`Saved correctly at Level ${savedLevel}. Your score is now visible worldwide.`);
       setLeaderboardStatus("Worldwide scores updated.");
       if (runStatus) runStatus.textContent = "Worldwide score saved";
     } catch (error) {
@@ -728,22 +763,69 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  function spawnObstacle() {
-    const roll = Math.random();
-    const kind = roll < .42 ? "cone" : roll < .74 ? "pothole" : "barrier";
-    const dimensions = {
-      cone: { width: 34, height: 50 },
-      pothole: { width: 78, height: 15 },
-      barrier: { width: 56, height: 52 }
-    }[kind];
+  const OBSTACLE_DIMENSIONS = {
+    cone: { width: 34, height: 50, points: 35 },
+    pothole: { width: 78, height: 15, points: 40 },
+    barrier: { width: 56, height: 52, points: 45 },
+    drum: { width: 44, height: 58, points: 55 },
+    traffic: { width: 112, height: 46, points: 90 },
+  };
 
+  const OBSTACLE_PATTERNS = {
+    2: [
+      [{ kind: "cone", offset: 0 }, { kind: "cone", offset: 92 }],
+      [{ kind: "pothole", offset: 0 }, { kind: "cone", offset: 138 }],
+    ],
+    3: [
+      [{ kind: "drum", offset: 0 }, { kind: "cone", offset: 118 }],
+      [{ kind: "cone", offset: 0 }, { kind: "pothole", offset: 142 }],
+      [{ kind: "barrier", offset: 0 }, { kind: "cone", offset: 138 }],
+    ],
+    4: [
+      [{ kind: "pothole", offset: 0 }, { kind: "drum", offset: 156 }],
+      [{ kind: "barrier", offset: 0 }, { kind: "cone", offset: 146 }],
+      [{ kind: "cone", offset: 0 }, { kind: "traffic", offset: 168 }],
+    ],
+    5: [
+      [{ kind: "cone", offset: 0 }, { kind: "cone", offset: 86 }, { kind: "pothole", offset: 204 }],
+      [{ kind: "drum", offset: 0 }, { kind: "barrier", offset: 132 }, { kind: "cone", offset: 232 }],
+      [{ kind: "pothole", offset: 0 }, { kind: "traffic", offset: 170 }, { kind: "cone", offset: 324 }],
+    ],
+  };
+
+  function addObstacle(kind, offset = 0) {
+    const dimensions = OBSTACLE_DIMENSIONS[kind] || OBSTACLE_DIMENSIONS.cone;
     obstacles.push({
       kind,
-      x: VIEW_W + 80,
+      x: VIEW_W + 80 + offset,
       width: dimensions.width,
       height: dimensions.height,
-      counted: false
+      points: dimensions.points,
+      counted: false,
     });
+  }
+
+  function randomObstacleKind(level) {
+    const roll = Math.random();
+    if (level.number >= 4 && roll < level.trafficChance) return "traffic";
+    if (level.number >= 3 && roll < level.trafficChance + .16) return "drum";
+    const roadRoll = Math.random();
+    return roadRoll < .4 ? "cone" : roadRoll < .7 ? "pothole" : "barrier";
+  }
+
+  function spawnObstacle() {
+    const level = getLevelConfig();
+    const patterns = OBSTACLE_PATTERNS[level.number] || [];
+
+    if (patterns.length && Math.random() < level.patternChance) {
+      const pattern = patterns[Math.floor(Math.random() * patterns.length)];
+      pattern.forEach((item) => addObstacle(item.kind, item.offset));
+      const lastOffset = pattern.reduce((largest, item) => Math.max(largest, item.offset), 0);
+      return .34 + (lastOffset / Math.max(speed, 1)) * .55;
+    }
+
+    addObstacle(randomObstacleKind(level));
+    return 0;
   }
 
   function spawnPickup() {
@@ -813,8 +895,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     obstacleClock -= dt;
     if (obstacleClock <= 0) {
-      spawnObstacle();
-      obstacleClock = level.spawnMin + Math.random() * level.spawnRange;
+      const patternRecovery = spawnObstacle();
+      obstacleClock = level.spawnMin + Math.random() * level.spawnRange + patternRecovery;
     }
 
     pickupClock -= dt;
@@ -830,11 +912,18 @@ document.addEventListener("DOMContentLoaded", () => {
       obstacle.x -= speed * dt;
 
       const obstacleY = obstacle.kind === "pothole" ? GROUND_Y - 8 : GROUND_Y - obstacle.height + 3;
+      const insets = {
+        cone: { x: 6, y: 7, width: 12, height: 10 },
+        pothole: { x: 12, y: 3, width: 24, height: 6 },
+        barrier: { x: 7, y: 7, width: 14, height: 12 },
+        drum: { x: 6, y: 5, width: 12, height: 9 },
+        traffic: { x: 12, y: 10, width: 24, height: 15 },
+      }[obstacle.kind] || { x: 5, y: 5, width: 10, height: 8 };
       const hitbox = {
-        x: obstacle.x + (obstacle.kind === "pothole" ? 8 : 4),
-        y: obstacleY + (obstacle.kind === "pothole" ? 3 : 4),
-        width: obstacle.width - (obstacle.kind === "pothole" ? 16 : 8),
-        height: Math.max(9, obstacle.height - 5)
+        x: obstacle.x + insets.x,
+        y: obstacleY + insets.y,
+        width: obstacle.width - insets.width,
+        height: Math.max(7, obstacle.height - insets.height),
       };
 
       const hasHit = obstacle.kind === "pothole"
@@ -848,7 +937,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (!obstacle.counted && obstacle.x + obstacle.width < player.x) {
         obstacle.counted = true;
-        score += 35;
+        score += obstacle.points || 35;
+        if (obstacle.kind === "traffic") showAnnouncement("+90 NEON TRAFFIC CLEAR");
       }
 
       if (obstacle.x + obstacle.width < -100) obstacles.splice(index, 1);
@@ -1150,6 +1240,68 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  function drawLevelAtmosphere() {
+    const level = getLevelConfig();
+    ctx.save();
+
+    if (level.map === "harbor") {
+      ctx.strokeStyle = "rgba(122, 219, 225, .2)";
+      ctx.lineWidth = 1.2;
+      for (let index = 0; index < 30; index += 1) {
+        const x = (index * 89 + distance * .48) % (VIEW_W + 100) - 50;
+        const y = (index * 61 + elapsed * 235) % (VIEW_H + 80) - 40;
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x - 12, y + 28);
+        ctx.stroke();
+      }
+    }
+
+    if (level.map === "desert") {
+      for (let index = 0; index < 24; index += 1) {
+        const span = VIEW_W + 120;
+        const rawX = (index * 127 - distance * .22) % span;
+        const x = (rawX + span) % span - 60;
+        const y = 255 + ((index * 41) % 205) + Math.sin(elapsed * 1.8 + index) * 9;
+        ctx.globalAlpha = .12 + (index % 5) * .025;
+        ctx.fillStyle = index % 3 === 0 ? "#f0c075" : "#c06f49";
+        ctx.beginPath();
+        ctx.arc(x, y, 1.2 + (index % 4) * .45, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    if (level.map === "downtown") {
+      for (let index = 0; index < 7; index += 1) {
+        const span = VIEW_W + 220;
+        const rawX = (index * 181 - distance * (1.12 + index * .02)) % span;
+        const x = (rawX + span) % span - 110;
+        const y = 384 + (index % 3) * 29;
+        const trail = ctx.createLinearGradient(x, y, x + 96, y);
+        trail.addColorStop(0, "rgba(213, 94, 233, 0)");
+        trail.addColorStop(1, index % 2 ? "rgba(73, 184, 189, .38)" : "rgba(213, 94, 233, .42)");
+        ctx.fillStyle = trail;
+        ctx.fillRect(x, y, 96, 2);
+      }
+    }
+
+    if (level.map === "golden") {
+      for (let index = 0; index < 18; index += 1) {
+        const x = (index * 151 + distance * .13) % (VIEW_W + 80) - 40;
+        const y = 250 + ((index * 47) % 185) + Math.sin(elapsed * 2.2 + index) * 8;
+        ctx.globalAlpha = .18 + (index % 4) * .06;
+        ctx.fillStyle = "#f4d58b";
+        ctx.beginPath();
+        ctx.arc(x, y, 1 + (index % 3) * .55, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    ctx.restore();
+  }
+
   function drawBackdrop() {
     const map = getLevelConfig().map;
     if (map === "boulevard") {
@@ -1275,11 +1427,105 @@ document.addEventListener("DOMContentLoaded", () => {
     ctx.stroke();
   }
 
+  function drawDrum(obstacle) {
+    const x = obstacle.x;
+    const y = GROUND_Y - obstacle.height + 3;
+    const body = ctx.createLinearGradient(x, y, x + obstacle.width, y);
+    body.addColorStop(0, "#6e3024");
+    body.addColorStop(.5, "#c7683c");
+    body.addColorStop(1, "#582219");
+    ctx.save();
+    ctx.fillStyle = body;
+    pathRoundRect(ctx, x + 3, y + 4, obstacle.width - 6, obstacle.height - 6, 7);
+    ctx.fill();
+    ctx.fillStyle = "rgba(244, 213, 139, .82)";
+    ctx.fillRect(x + 3, y + 16, obstacle.width - 6, 6);
+    ctx.fillRect(x + 3, y + obstacle.height - 18, obstacle.width - 6, 6);
+    ctx.strokeStyle = "rgba(244, 239, 229, .42)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.ellipse(x + obstacle.width / 2, y + 6, obstacle.width / 2 - 4, 5, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.fillStyle = "rgba(8, 9, 10, .78)";
+    ctx.font = "700 9px Space Grotesk, sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("DR", x + obstacle.width / 2, y + 37);
+    ctx.restore();
+  }
+
+  function drawTraffic(obstacle) {
+    const level = getLevelConfig();
+    const x = obstacle.x;
+    const y = GROUND_Y - obstacle.height + 3;
+    ctx.save();
+
+    ctx.fillStyle = "rgba(0, 0, 0, .5)";
+    ctx.beginPath();
+    ctx.ellipse(x + obstacle.width / 2, GROUND_Y + 2, obstacle.width * .48, 8, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    const body = ctx.createLinearGradient(x, y, x, y + obstacle.height);
+    body.addColorStop(0, level.map === "golden" ? "#765523" : "#5f286a");
+    body.addColorStop(.48, "#201124");
+    body.addColorStop(1, "#08080a");
+    ctx.fillStyle = body;
+    ctx.beginPath();
+    ctx.moveTo(x + 3, y + 25);
+    ctx.lineTo(x + 20, y + 15);
+    ctx.lineTo(x + 40, y + 12);
+    ctx.lineTo(x + 54, y + 1);
+    ctx.lineTo(x + 82, y + 3);
+    ctx.lineTo(x + 94, y + 15);
+    ctx.lineTo(x + 107, y + 20);
+    ctx.lineTo(x + 110, y + 35);
+    ctx.lineTo(x + 4, y + 36);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.fillStyle = "rgba(53, 153, 170, .58)";
+    ctx.beginPath();
+    ctx.moveTo(x + 56, y + 4);
+    ctx.lineTo(x + 79, y + 6);
+    ctx.lineTo(x + 89, y + 15);
+    ctx.lineTo(x + 47, y + 14);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.strokeStyle = level.accent;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(x + 10, y + 28);
+    ctx.lineTo(x + 104, y + 27);
+    ctx.stroke();
+
+    [x + 27, x + 87].forEach((wheelX) => {
+      ctx.fillStyle = "#050506";
+      ctx.beginPath();
+      ctx.arc(wheelX, y + 37, 10, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = "#d7dcd9";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(wheelX, y + 37, 6, 0, Math.PI * 2);
+      ctx.stroke();
+    });
+
+    ctx.fillStyle = "rgba(244, 213, 139, .95)";
+    ctx.fillRect(x + 103, y + 22, 7, 4);
+    ctx.shadowColor = level.accent;
+    ctx.shadowBlur = 12;
+    ctx.fillStyle = level.accent;
+    ctx.fillRect(x + 12, y + 35, 78, 2);
+    ctx.restore();
+  }
+
   function drawObstacles() {
     obstacles.forEach((obstacle) => {
       if (obstacle.kind === "cone") drawCone(obstacle);
       if (obstacle.kind === "barrier") drawBarrier(obstacle);
       if (obstacle.kind === "pothole") drawPothole(obstacle);
+      if (obstacle.kind === "drum") drawDrum(obstacle);
+      if (obstacle.kind === "traffic") drawTraffic(obstacle);
     });
   }
 
@@ -1539,6 +1785,7 @@ document.addEventListener("DOMContentLoaded", () => {
     drawSky();
     drawBackdrop();
     drawRoad();
+    drawLevelAtmosphere();
     drawPickups();
     drawObstacles();
     drawLowrider();
