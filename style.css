@@ -1017,20 +1017,34 @@ button {
   }
 
   .site-nav {
-    position: fixed;
-    inset: 72px 0 0;
+    position: absolute;
+    top: 72px;
+    left: 0;
+    width: 100vw;
+    height: calc(100vh - 72px);
+    height: calc(100dvh - 72px);
+    min-height: calc(100svh - 72px);
+    z-index: 1;
     display: flex;
     align-items: stretch;
     justify-content: center;
     flex-direction: column;
     gap: 0;
     padding: 32px 22px;
-    background: rgba(7,7,8,.98);
-    backdrop-filter: blur(18px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    background: #070708;
     opacity: 0;
     visibility: hidden;
     transform: translateY(-12px);
     transition: opacity .25s ease, visibility .25s ease, transform .25s ease;
+  }
+
+  .site-header .brand,
+  .site-header .menu-toggle {
+    position: relative;
+    z-index: 2;
   }
 
   .site-nav.open {
