@@ -968,7 +968,7 @@
   width: 18px;
   height: 50%;
   box-sizing: border-box;
-  padding-top: clamp(26px, 9vw, 42px);
+  padding-top: clamp(18px, 6vw, 24px);
   color: rgba(255, 248, 221, .92);
   font-size: 7px;
   font-weight: 800;
