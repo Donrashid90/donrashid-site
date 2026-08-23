@@ -28,6 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const walletAddress = document.getElementById("walletAddress");
   const drcBalance = document.getElementById("drcBalance");
   const holderTierLabel = document.getElementById("holderTier");
+  const holderCosmeticStatus = document.getElementById("holderCosmeticStatus");
   const connectWalletButton = document.getElementById("connectWallet");
   const addTokenButton = document.getElementById("addTokenButton");
   const clearWalletButton = document.getElementById("clearWalletButton");
@@ -40,6 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const resetCreditsButton = document.getElementById("resetCreditsButton");
   const machineTabs = [...document.querySelectorAll("[data-machine]")];
   const machinePanels = [...document.querySelectorAll("[data-panel]")];
+  const machineFullscreenButtons = [...document.querySelectorAll("[data-machine-fullscreen]")];
 
   const slotReels = document.getElementById("slotReels");
   const spinButton = document.getElementById("spinButton");
@@ -62,6 +64,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const flipChoiceButtons = [...document.querySelectorAll("[data-flip-choice]")];
 
   const CREDIT_STORAGE_KEY = "don-rashid-arcade-credits-v1";
+  const HOLDER_ACCESS_KEY = "don-rashid-holder-access-v1";
+  const HOLDER_ACCESS_MAX_AGE = 30 * 24 * 60 * 60 * 1000;
   const BASE_SEPOLIA_CHAIN_ID = network.chainId || "0x14a34";
   const tokenConfigured = isEthereumAddress(token.address)
     && !/^0x0{40}$/i.test(token.address);
@@ -77,6 +81,35 @@ document.addEventListener("DOMContentLoaded", () => {
   let rouletteBallRotation = 0;
   let slotCells = [];
   let creditsState = loadCredits();
+  let cachedHolderAccess = readHolderAccess();
+  let pseudoFullscreenPanel = null;
+
+  function readHolderAccess() {
+    try {
+      const stored = JSON.parse(localStorage.getItem(HOLDER_ACCESS_KEY) || "null");
+      if (!stored || !Number.isFinite(Number(stored.minimum)) || Date.now() - Number(stored.verifiedAt) > HOLDER_ACCESS_MAX_AGE) {
+        localStorage.removeItem(HOLDER_ACCESS_KEY);
+        return null;
+      }
+      return stored;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function saveHolderAccess(activeTier) {
+    cachedHolderAccess = {
+      minimum: Number(activeTier.minimum || 0),
+      name: activeTier.name,
+      balance: wholeBalance.toString(),
+      verifiedAt: Date.now(),
+    };
+    try {
+      localStorage.setItem(HOLDER_ACCESS_KEY, JSON.stringify(cachedHolderAccess));
+    } catch (error) {
+      // Cosmetic access remains active for this session when storage is unavailable.
+    }
+  }
 
   function readStoredCredits() {
     try {
@@ -155,6 +188,73 @@ document.addEventListener("DOMContentLoaded", () => {
       panel.hidden = !active;
       panel.classList.toggle("is-active", active);
     });
+  }
+
+  function nativeFullscreenElement() {
+    return document.fullscreenElement || document.webkitFullscreenElement || null;
+  }
+
+  function updateMachineFullscreenButtons() {
+    const nativePanel = nativeFullscreenElement();
+    machineFullscreenButtons.forEach((button) => {
+      const panel = button.closest(".machine-panel");
+      const active = panel === nativePanel || panel === pseudoFullscreenPanel;
+      const label = button.lastElementChild;
+      if (label) label.textContent = active ? "Exit fullscreen" : "Fullscreen";
+      button.setAttribute("aria-pressed", String(active));
+      button.setAttribute("aria-label", active ? "Exit machine fullscreen" : "Open machine fullscreen");
+    });
+  }
+
+  function openPseudoMachineFullscreen(panel) {
+    if (!panel) return;
+    if (pseudoFullscreenPanel && pseudoFullscreenPanel !== panel) {
+      pseudoFullscreenPanel.classList.remove("is-pseudo-fullscreen");
+    }
+    pseudoFullscreenPanel = panel;
+    panel.classList.add("is-pseudo-fullscreen");
+    document.body.classList.add("arcade-fullscreen-lock");
+    panel.scrollTop = 0;
+    updateMachineFullscreenButtons();
+  }
+
+  function closePseudoMachineFullscreen() {
+    if (!pseudoFullscreenPanel) return;
+    pseudoFullscreenPanel.classList.remove("is-pseudo-fullscreen");
+    pseudoFullscreenPanel = null;
+    document.body.classList.remove("arcade-fullscreen-lock");
+    updateMachineFullscreenButtons();
+  }
+
+  async function toggleMachineFullscreen(button) {
+    const panel = button.closest(".machine-panel");
+    if (!panel) return;
+
+    if (panel === pseudoFullscreenPanel) {
+      closePseudoMachineFullscreen();
+      return;
+    }
+
+    if (nativeFullscreenElement() === panel) {
+      const exit = document.exitFullscreen || document.webkitExitFullscreen;
+      if (exit) await exit.call(document);
+      return;
+    }
+
+    const request = panel.requestFullscreen || panel.webkitRequestFullscreen;
+    if (!request) {
+      openPseudoMachineFullscreen(panel);
+      return;
+    }
+
+    try {
+      await request.call(panel);
+      await new Promise((resolve) => window.requestAnimationFrame(resolve));
+      if (nativeFullscreenElement() !== panel) openPseudoMachineFullscreen(panel);
+      else updateMachineFullscreenButtons();
+    } catch (error) {
+      openPseudoMachineFullscreen(panel);
+    }
   }
 
   function setResult(element, message, isWin = false) {
@@ -469,9 +569,19 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function updateHolderAccess() {
-    const activeBalance = walletVerified ? wholeBalance : 0n;
+    const cachedMinimum = cachedHolderAccess ? BigInt(Math.max(0, Number(cachedHolderAccess.minimum) || 0)) : 0n;
+    const activeBalance = walletVerified ? wholeBalance : cachedMinimum;
     const activeTier = holderTier(activeBalance, config.holderTiers);
-    if (holderTierLabel) holderTierLabel.textContent = activeTier.name;
+    if (walletVerified) saveHolderAccess(activeTier);
+    if (holderTierLabel) holderTierLabel.textContent = walletVerified ? activeTier.name : `${activeTier.name}${cachedHolderAccess ? " / saved" : ""}`;
+
+    const cosmeticCopy = {
+      "Street Access": "Street build active",
+      "Chrome Access": "Gold lowrider skin active in Night Run",
+      "Neon Access": "Gold skin + VIP Neon Strip map active",
+      "Crown Access": "Crown arcade theme, badge and all cosmetics active",
+    };
+    if (holderCosmeticStatus) holderCosmeticStatus.textContent = cosmeticCopy[activeTier.name] || activeTier.unlock;
 
     tierCards.forEach((card) => {
       const minimum = BigInt(card.dataset.tierMinimum || "0");
@@ -481,10 +591,18 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.dataset.holderTier = activeTier.name.toLowerCase().replace(/\s+/g, "-");
   }
 
-  function resetWalletUi() {
+  function resetWalletUi(clearSavedAccess = false) {
     connectedAccount = "";
     walletVerified = false;
     wholeBalance = 0n;
+    if (clearSavedAccess) {
+      cachedHolderAccess = null;
+      try {
+        localStorage.removeItem(HOLDER_ACCESS_KEY);
+      } catch (error) {
+        // Clearing a cosmetic cache is optional.
+      }
+    }
     walletPanel?.classList.remove("is-connected");
     if (walletStateLabel) walletStateLabel.textContent = "Wallet not connected";
     if (walletAddress) walletAddress.textContent = "CONNECT TO VERIFY";
@@ -589,6 +707,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   machineTabs.forEach((button) => button.addEventListener("click", () => showMachine(button.dataset.machine)));
+  machineFullscreenButtons.forEach((button) => button.addEventListener("click", () => void toggleMachineFullscreen(button)));
   if (spinButton) spinButton.addEventListener("click", () => void spinSlots());
   if (rouletteButton) rouletteButton.addEventListener("click", () => void rollRoulette());
   if (flipButton) flipButton.addEventListener("click", () => void flipChromeCoin());
@@ -617,12 +736,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (connectWalletButton) connectWalletButton.addEventListener("click", () => void connectWallet());
   if (addTokenButton) addTokenButton.addEventListener("click", () => void addTokenToWallet());
-  if (clearWalletButton) clearWalletButton.addEventListener("click", resetWalletUi);
+  if (clearWalletButton) clearWalletButton.addEventListener("click", () => resetWalletUi(true));
   if (resetCreditsButton) resetCreditsButton.addEventListener("click", () => {
     creditsState = { credits: DAILY_CREDIT_GRANT, lastGrant: dayKey(), granted: false };
     saveCredits();
     updateCredits("Demo balance reset to 1,000 free DR Credits.");
     if (creditGrantStatus) creditGrantStatus.textContent = "Demo balance reset";
+  });
+
+  document.addEventListener("fullscreenchange", updateMachineFullscreenButtons);
+  document.addEventListener("webkitfullscreenchange", updateMachineFullscreenButtons);
+  document.addEventListener("keydown", (event) => {
+    if (event.code === "Escape" && pseudoFullscreenPanel) closePseudoMachineFullscreen();
   });
 
   if (creditGrantStatus) {

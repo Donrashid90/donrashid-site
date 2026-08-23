@@ -30,7 +30,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../style.css?v=7" />
-  <link rel="stylesheet" href="arcade.css?v=6" />
+  <link rel="stylesheet" href="arcade.css?v=8" />
 </head>
 <body class="arcade-page">
   <a class="skip-link" href="#arcade-main">Skip to arcade</a>
@@ -51,7 +51,7 @@
       <a href="/#music">Music</a>
       <a href="/#merch">Merch</a>
       <a href="/game/">Game</a>
-      <a class="nav-current" href="/arcade/?v=5" aria-current="page">Arcade</a>
+      <a class="nav-current" href="/arcade/?v=8" aria-current="page">Arcade</a>
       <a href="/#artist">Artist</a>
       <a href="https://youtube.com/@donrashidofficial" target="_blank" rel="noopener noreferrer">YouTube <span class="arrow" aria-hidden="true">&#8599;&#65038;</span></a>
       <a class="nav-stream" href="https://open.spotify.com/artist/0HbtnpVZONVd7S09jqmRZZ" target="_blank" rel="noopener noreferrer">Stream <span class="arrow" aria-hidden="true">&#8599;&#65038;</span></a>
@@ -103,6 +103,7 @@
                 <dd id="holderTier">Street Access</dd>
               </div>
             </dl>
+            <p class="holder-cosmetic-status" id="holderCosmeticStatus">Street build active</p>
 
             <button class="wallet-connect" id="connectWallet" type="button">
               <span>Connect wallet</span><span aria-hidden="true">→</span>
@@ -175,7 +176,7 @@
             <span>03</span><strong>Chrome Flip</strong><small>10 credits</small>
           </button>
           <a class="machine-tab machine-link" href="/game/">
-            <span>04</span><strong>Night Run</strong><small>Five-level campaign ↗</small>
+            <span>04</span><strong>Night Run</strong><small>20-level campaign ↗</small>
           </a>
         </nav>
 
@@ -188,7 +189,10 @@
           <section class="machine-panel is-active" id="slotsPanel" data-panel="slots" aria-labelledby="slots-title">
             <div class="machine-credit-strip" aria-label="Current free DR Credits balance">
               <span>Available to play</span>
-              <strong><span data-credit-balance>1,000</span> DR CREDITS</strong>
+              <div class="machine-credit-actions">
+                <strong><span data-credit-balance>1,000</span> DR CREDITS</strong>
+                <button class="machine-fullscreen-button" type="button" data-machine-fullscreen aria-pressed="false"><span aria-hidden="true">⛶</span><span>Fullscreen</span></button>
+              </div>
             </div>
             <div class="machine-copy">
               <p class="machine-number">01 / LOWRIDER SLOTS</p>
@@ -210,7 +214,10 @@
           <section class="machine-panel" id="roulettePanel" data-panel="roulette" aria-labelledby="roulette-title" hidden>
             <div class="machine-credit-strip" aria-label="Current free DR Credits balance">
               <span>Available to play</span>
-              <strong><span data-credit-balance>1,000</span> DR CREDITS</strong>
+              <div class="machine-credit-actions">
+                <strong><span data-credit-balance>1,000</span> DR CREDITS</strong>
+                <button class="machine-fullscreen-button" type="button" data-machine-fullscreen aria-pressed="false"><span aria-hidden="true">⛶</span><span>Fullscreen</span></button>
+              </div>
             </div>
             <div class="machine-copy">
               <p class="machine-number">02 / MIDNIGHT ROULETTE</p>
@@ -240,7 +247,10 @@
           <section class="machine-panel" id="flipPanel" data-panel="flip" aria-labelledby="flip-title" hidden>
             <div class="machine-credit-strip" aria-label="Current free DR Credits balance">
               <span>Available to play</span>
-              <strong><span data-credit-balance>1,000</span> DR CREDITS</strong>
+              <div class="machine-credit-actions">
+                <strong><span data-credit-balance>1,000</span> DR CREDITS</strong>
+                <button class="machine-fullscreen-button" type="button" data-machine-fullscreen aria-pressed="false"><span aria-hidden="true">⛶</span><span>Fullscreen</span></button>
+              </div>
             </div>
             <div class="machine-copy">
               <p class="machine-number">03 / CHROME FLIP</p>
@@ -293,6 +303,6 @@
 
   <script src="../script.js?v=2"></script>
   <script src="config.js?v=2"></script>
-  <script type="module" src="arcade.js?v=6"></script>
+  <script type="module" src="arcade.js?v=8"></script>
 </body>
 </html>

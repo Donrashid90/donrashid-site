@@ -267,6 +267,51 @@
   white-space: nowrap;
 }
 
+.holder-cosmetic-status {
+  margin: -5px 0 19px;
+  padding: 11px 13px;
+  border-left: 2px solid var(--gold);
+  background: rgba(203, 162, 91, .07);
+  color: var(--ink-soft);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  line-height: 1.55;
+  text-transform: uppercase;
+}
+
+body[data-holder-tier="chrome-access"] .machine-console,
+body[data-holder-tier="neon-access"] .machine-console,
+body[data-holder-tier="crown-access"] .machine-console {
+  border-color: rgba(244, 213, 139, .62);
+  box-shadow: 0 38px 120px rgba(0, 0, 0, .4), 0 0 34px rgba(203, 162, 91, .08);
+}
+
+body[data-holder-tier="neon-access"] .arcade-floor {
+  background:
+    radial-gradient(circle at 14% 32%, rgba(47, 228, 215, .14), transparent 27%),
+    radial-gradient(circle at 82% 64%, rgba(198, 82, 231, .1), transparent 24%),
+    linear-gradient(180deg, #060809, #080809 58%, #070708);
+}
+
+body[data-holder-tier="neon-access"] .machine-credit-strip,
+body[data-holder-tier="crown-access"] .machine-credit-strip {
+  box-shadow: inset 3px 0 0 var(--gold), 0 0 28px rgba(64, 216, 211, .08);
+}
+
+body[data-holder-tier="crown-access"] .wallet-console {
+  border-color: rgba(244, 213, 139, .78);
+  background:
+    radial-gradient(circle at 84% 12%, rgba(244, 213, 139, .24), transparent 25%),
+    linear-gradient(145deg, rgba(31, 24, 13, .98), rgba(7, 8, 9, .98));
+  box-shadow: 0 34px 100px rgba(0, 0, 0, .48), 0 0 44px rgba(203, 162, 91, .13);
+}
+
+body[data-holder-tier="crown-access"] .holder-cosmetic-status::before {
+  content: "CROWN • ";
+  color: var(--gold-light);
+}
+
 .wallet-connect,
 .machine-action {
   width: 100%;
@@ -619,6 +664,45 @@
   letter-spacing: -.02em;
   line-height: 1;
   white-space: nowrap;
+}
+
+.machine-credit-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 18px;
+}
+
+.machine-fullscreen-button {
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid rgba(203, 162, 91, .42);
+  background: rgba(203, 162, 91, .07);
+  color: var(--gold-light);
+  font-family: var(--body);
+  font-size: 7px;
+  font-weight: 800;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.machine-fullscreen-button > span:first-child {
+  font-size: 15px;
+  line-height: 1;
+}
+
+.machine-fullscreen-button:hover,
+.machine-fullscreen-button:focus-visible,
+.machine-fullscreen-button[aria-pressed="true"] {
+  border-color: var(--gold-light);
+  background: rgba(203, 162, 91, .17);
+  color: #fff7e6;
 }
 
 .machine-copy {
@@ -1380,6 +1464,17 @@
     padding: 34px 24px;
   }
 
+  .machine-credit-strip {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .machine-credit-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
   .machine-copy h3 {
     font-size: clamp(43px, 14vw, 66px);
   }
@@ -1439,6 +1534,142 @@
 
   .safety-grid strong {
     margin-top: 42px;
+  }
+}
+
+body.arcade-fullscreen-lock {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+body.arcade-fullscreen-lock .machine-console {
+  overflow: visible;
+  transform: none;
+}
+
+.machine-panel:fullscreen,
+.machine-panel:-webkit-full-screen,
+.machine-panel.is-pseudo-fullscreen {
+  width: 100vw;
+  height: 100dvh;
+  min-height: 100dvh;
+  max-width: none;
+  grid-template-rows: auto minmax(0, 1fr);
+  border: 0;
+  background-color: #08090a;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.machine-panel.is-pseudo-fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+}
+
+.machine-panel:fullscreen .machine-credit-strip,
+.machine-panel:-webkit-full-screen .machine-credit-strip,
+.machine-panel.is-pseudo-fullscreen .machine-credit-strip {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+@media (max-width: 900px) {
+  .machine-panel:fullscreen,
+  .machine-panel:-webkit-full-screen,
+  .machine-panel.is-pseudo-fullscreen {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto minmax(0, 1fr);
+  }
+
+  .machine-panel:fullscreen .machine-copy,
+  .machine-panel:-webkit-full-screen .machine-copy,
+  .machine-panel.is-pseudo-fullscreen .machine-copy {
+    min-height: auto;
+    padding: 24px;
+  }
+
+  .machine-panel:fullscreen .machine-copy h3,
+  .machine-panel:-webkit-full-screen .machine-copy h3,
+  .machine-panel.is-pseudo-fullscreen .machine-copy h3 {
+    margin: 13px 0 15px;
+    font-size: clamp(35px, 9vw, 58px);
+  }
+
+  .machine-panel:fullscreen .slots-machine,
+  .machine-panel:fullscreen .roulette-machine,
+  .machine-panel:fullscreen .flip-machine,
+  .machine-panel:-webkit-full-screen .slots-machine,
+  .machine-panel:-webkit-full-screen .roulette-machine,
+  .machine-panel:-webkit-full-screen .flip-machine,
+  .machine-panel.is-pseudo-fullscreen .slots-machine,
+  .machine-panel.is-pseudo-fullscreen .roulette-machine,
+  .machine-panel.is-pseudo-fullscreen .flip-machine {
+    min-height: min(560px, calc(100dvh - 210px));
+  }
+}
+
+@media (orientation: landscape) and (max-height: 700px) {
+  .machine-panel:fullscreen,
+  .machine-panel:-webkit-full-screen,
+  .machine-panel.is-pseudo-fullscreen {
+    grid-template-columns: minmax(260px, .72fr) minmax(380px, 1.28fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    overflow: hidden;
+  }
+
+  .machine-panel:fullscreen .machine-credit-strip,
+  .machine-panel:-webkit-full-screen .machine-credit-strip,
+  .machine-panel.is-pseudo-fullscreen .machine-credit-strip {
+    min-height: 48px;
+    padding: 6px 16px;
+    flex-direction: row;
+  }
+
+  .machine-panel:fullscreen .machine-copy,
+  .machine-panel:-webkit-full-screen .machine-copy,
+  .machine-panel.is-pseudo-fullscreen .machine-copy {
+    min-height: 0;
+    padding: 16px 20px;
+    border-right: 1px solid var(--line);
+    border-bottom: 0;
+    overflow: auto;
+  }
+
+  .machine-panel:fullscreen .machine-copy h3,
+  .machine-panel:-webkit-full-screen .machine-copy h3,
+  .machine-panel.is-pseudo-fullscreen .machine-copy h3 {
+    margin: 9px 0 11px;
+    font-size: clamp(29px, 7vh, 43px);
+  }
+
+  .machine-panel:fullscreen .machine-copy > p:not(.machine-number),
+  .machine-panel:-webkit-full-screen .machine-copy > p:not(.machine-number),
+  .machine-panel.is-pseudo-fullscreen .machine-copy > p:not(.machine-number) {
+    font-size: 9px;
+    line-height: 1.45;
+  }
+
+  .machine-panel:fullscreen .slots-machine,
+  .machine-panel:fullscreen .roulette-machine,
+  .machine-panel:fullscreen .flip-machine,
+  .machine-panel:-webkit-full-screen .slots-machine,
+  .machine-panel:-webkit-full-screen .roulette-machine,
+  .machine-panel:-webkit-full-screen .flip-machine,
+  .machine-panel.is-pseudo-fullscreen .slots-machine,
+  .machine-panel.is-pseudo-fullscreen .roulette-machine,
+  .machine-panel.is-pseudo-fullscreen .flip-machine {
+    min-height: 0;
+    height: 100%;
+    padding: 14px;
+    overflow: auto;
+  }
+
+  .machine-panel:fullscreen .roulette-stage,
+  .machine-panel:-webkit-full-screen .roulette-stage,
+  .machine-panel.is-pseudo-fullscreen .roulette-stage {
+    width: min(270px, 62vh);
   }
 }
 
