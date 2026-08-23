@@ -31,6 +31,15 @@ test("every Arcade JavaScript element id exists in the Arcade document", () => {
   assert.deepEqual(missing, []);
 });
 
+test("upgrades the Arcade with five-reel slots and numbered roulette", () => {
+  assert.match(files["arcade/index.html"], /id="slotReels"/);
+  assert.match(files["arcade/index.html"], /5 LINES/);
+  assert.match(files["arcade/index.html"], /id="rouletteNumberGrid"/);
+  assert.match(files["arcade/index.html"], /id="rouletteBall"/);
+  assert.match(files["arcade/arcade.js"], /ROULETTE_ORDER/);
+  assert.match(files["arcade/arcade.js"], /Array\.from\(\{ length: 5 \}/);
+});
+
 test("the browser integration contains no token-spending RPC method", () => {
   const integration = files["arcade/arcade.js"];
   assert.doesNotMatch(integration, /eth_sendTransaction|eth_sendRawTransaction|eth_signTransaction|transferFrom|\bapprove\s*\(/);
