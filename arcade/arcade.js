@@ -1,18 +1,20 @@
 import {
   DAILY_CREDIT_GRANT,
   GAME_COSTS,
+  ROULETTE_ORDER,
   SLOT_SYMBOLS,
   applyDailyCreditGrant,
   dayKey,
   flipResult,
   holderTier,
   isEthereumAddress,
+  rouletteColor,
   rouletteResult,
   secureRandomIndex,
   shortenAddress,
-  slotPayout,
+  slotPayoutDetails,
   wholeTokenBalance
-} from "./core.js";
+} from "./core.js?v=2";
 
 document.addEventListener("DOMContentLoaded", () => {
   const config = window.DR_ARCADE_CONFIG || {};
@@ -39,14 +41,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const machinePanels = [...document.querySelectorAll("[data-panel]")];
 
   const slotReels = document.getElementById("slotReels");
-  const reelValues = [...document.querySelectorAll("[data-reel]")];
   const spinButton = document.getElementById("spinButton");
   const slotsResult = document.getElementById("slotsResult");
 
   const rouletteWheel = document.getElementById("rouletteWheel");
+  const rouletteBall = document.getElementById("rouletteBall");
+  const roulettePockets = document.getElementById("roulettePockets");
+  const rouletteNumberGrid = document.getElementById("rouletteNumberGrid");
+  const rouletteBetLabel = document.getElementById("rouletteBetLabel");
   const rouletteButton = document.getElementById("rouletteButton");
   const rouletteResultLabel = document.getElementById("rouletteResult");
-  const rouletteChoiceButtons = [...document.querySelectorAll("[data-roulette-choice]")];
+  const rouletteColorButtons = [...document.querySelectorAll("[data-roulette-color]")];
 
   const flipCoin = document.getElementById("flipCoin");
   const flipButton = document.getElementById("flipButton");
@@ -63,9 +68,11 @@ document.addEventListener("DOMContentLoaded", () => {
   let walletVerified = false;
   let wholeBalance = 0n;
   let machineBusy = false;
-  let rouletteChoice = "gold";
+  let rouletteBet = { type: "color", value: "gold" };
   let flipChoice = "dr";
   let rouletteRotation = 0;
+  let rouletteBallRotation = 0;
+  let slotCells = [];
   let creditsState = loadCredits();
 
   function readStoredCredits() {
@@ -153,62 +160,179 @@ document.addEventListener("DOMContentLoaded", () => {
     return SLOT_SYMBOLS[secureRandomIndex(SLOT_SYMBOLS.length)];
   }
 
-  function displayReelSymbol(element, symbol) {
+  function displaySlotSymbol(element, symbol) {
     if (!element || !symbol) return;
     element.textContent = symbol.icon;
-    const label = element.parentElement?.querySelector("small");
-    if (label) label.textContent = symbol.label;
+    element.dataset.symbol = symbol.id;
+    element.setAttribute("aria-label", symbol.label);
+  }
+
+  function buildSlotMachine() {
+    if (!slotReels) return;
+    slotReels.replaceChildren();
+    slotCells = [];
+
+    for (let reelIndex = 0; reelIndex < 5; reelIndex += 1) {
+      const reel = document.createElement("div");
+      reel.className = "slot-reel";
+      reel.dataset.reel = String(reelIndex);
+      const cells = [];
+
+      for (let rowIndex = 0; rowIndex < 3; rowIndex += 1) {
+        const cell = document.createElement("span");
+        cell.className = "slot-cell";
+        cell.dataset.row = String(rowIndex);
+        displaySlotSymbol(cell, SLOT_SYMBOLS[(reelIndex + rowIndex + 1) % SLOT_SYMBOLS.length]);
+        reel.append(cell);
+        cells.push(cell);
+      }
+
+      slotReels.append(reel);
+      slotCells.push(cells);
+    }
+  }
+
+  function randomSlotGrid() {
+    return Array.from({ length: 5 }, () => Array.from({ length: 3 }, () => randomSymbol()));
+  }
+
+  function showSlotGrid(grid, throughReel = 4) {
+    slotCells.forEach((cells, reelIndex) => {
+      if (reelIndex > throughReel) return;
+      cells.forEach((cell, rowIndex) => displaySlotSymbol(cell, grid[reelIndex][rowIndex]));
+    });
+  }
+
+  function clearWinningSlotCells() {
+    slotCells.flat().forEach((cell) => cell.classList.remove("is-winning"));
+  }
+
+  function highlightSlotWins(wins) {
+    wins.forEach((win) => {
+      for (let reelIndex = 0; reelIndex < win.count; reelIndex += 1) {
+        slotCells[reelIndex]?.[win.rows[reelIndex]]?.classList.add("is-winning");
+      }
+    });
   }
 
   async function spinSlots() {
     if (!spendCredits(GAME_COSTS.slots) || !slotReels) return;
     setMachineBusy(true);
-    setResult(slotsResult, "Chrome is moving…");
+    clearWinningSlotCells();
+    setResult(slotsResult, "Five reels are moving through the night…");
     slotReels.classList.add("is-spinning");
 
     const shuffleTimer = window.setInterval(() => {
-      reelValues.forEach((element) => displayReelSymbol(element, randomSymbol()));
-    }, 95);
+      showSlotGrid(randomSlotGrid());
+    }, 80);
 
-    await wait(760);
+    await wait(620);
     window.clearInterval(shuffleTimer);
+    const grid = randomSlotGrid();
+
+    for (let reelIndex = 0; reelIndex < 5; reelIndex += 1) {
+      showSlotGrid(grid, reelIndex);
+      slotReels.querySelector(`[data-reel="${reelIndex}"]`)?.classList.add("is-stopped");
+      await wait(170 + reelIndex * 35);
+    }
+
     slotReels.classList.remove("is-spinning");
+    slotReels.querySelectorAll(".slot-reel").forEach((reel) => reel.classList.remove("is-stopped"));
+    const details = slotPayoutDetails(grid.map((reel) => reel.map((symbol) => symbol.id)));
 
-    const symbols = reelValues.map((element) => {
-      const symbol = randomSymbol();
-      displayReelSymbol(element, symbol);
-      return symbol;
-    });
-    const payout = slotPayout(symbols.map((symbol) => symbol.id));
-
-    if (payout > 0) {
-      awardCredits(payout, `Lowrider Slots returned ${payout} free DR Credits.`);
-      setResult(slotsResult, `${symbols.map((symbol) => symbol.label).join(" • ")} — +${payout} DR Credits`, true);
+    if (details.total > 0) {
+      highlightSlotWins(details.wins);
+      awardCredits(details.total, `Boulevard Gold returned ${details.total} free DR Credits.`);
+      const lineLabel = details.wins.length === 1 ? "line" : "lines";
+      setResult(slotsResult, `${details.wins.length} winning ${lineLabel} — +${details.total} DR Credits`, true);
     } else {
       updateCredits("No match this time. DRC in your wallet was never touched.");
-      setResult(slotsResult, `${symbols.map((symbol) => symbol.label).join(" • ")} — No match`);
+      setResult(slotsResult, "No complete line. The next boulevard is waiting.");
     }
 
     setMachineBusy(false);
   }
 
+  function buildRoulette() {
+    if (!roulettePockets || !rouletteNumberGrid || !rouletteWheel) return;
+    roulettePockets.replaceChildren();
+    rouletteNumberGrid.replaceChildren();
+    const step = 360 / ROULETTE_ORDER.length;
+    const gradientStops = [];
+
+    ROULETTE_ORDER.forEach((number, index) => {
+      const color = rouletteColor(number);
+      const pocket = document.createElement("span");
+      pocket.className = `roulette-pocket is-${color}`;
+      pocket.textContent = String(number);
+      pocket.style.setProperty("--pocket-angle", `${index * step}deg`);
+      roulettePockets.append(pocket);
+
+      const start = index * step;
+      const end = (index + 1) * step;
+      const colorValue = color === "green" ? "#295d4a" : color === "gold" ? "#b88232" : "#08090a";
+      gradientStops.push(`${colorValue} ${start}deg ${end}deg`);
+    });
+
+    rouletteWheel.style.setProperty("--roulette-gradient", `conic-gradient(${gradientStops.join(",")})`);
+
+    for (let number = 0; number <= 36; number += 1) {
+      const button = document.createElement("button");
+      const color = rouletteColor(number);
+      button.className = `roulette-number is-${color}`;
+      button.type = "button";
+      button.textContent = String(number);
+      button.dataset.rouletteNumber = String(number);
+      button.setAttribute("aria-pressed", "false");
+      rouletteNumberGrid.append(button);
+    }
+  }
+
+  function updateRouletteSelection() {
+    rouletteColorButtons.forEach((button) => {
+      const selected = rouletteBet.type === "color" && button.dataset.rouletteColor === rouletteBet.value;
+      button.classList.toggle("is-selected", selected);
+      button.setAttribute("aria-pressed", String(selected));
+    });
+
+    rouletteNumberGrid?.querySelectorAll("[data-roulette-number]").forEach((button) => {
+      const selected = rouletteBet.type === "number" && Number(button.dataset.rouletteNumber) === rouletteBet.value;
+      button.classList.toggle("is-selected", selected);
+      button.setAttribute("aria-pressed", String(selected));
+    });
+
+    const label = rouletteBet.type === "number" ? `Number ${rouletteBet.value} ×36` : `${rouletteBet.value === "gold" ? "Gold" : "Black"} ×2`;
+    if (rouletteBetLabel) rouletteBetLabel.textContent = label;
+    setResult(rouletteResultLabel, `${label} selected.`);
+  }
+
   async function rollRoulette() {
-    if (!spendCredits(GAME_COSTS.roulette) || !rouletteWheel) return;
+    if (!spendCredits(GAME_COSTS.roulette) || !rouletteWheel || !rouletteBall) return;
     setMachineBusy(true);
-    setResult(rouletteResultLabel, "The Midnight wheel is moving…");
+    setResult(rouletteResultLabel, "The ball is running around Midnight Boulevard…");
 
-    const outcome = secureRandomIndex(2) === 0 ? "gold" : "black";
-    rouletteRotation += 1440 + (outcome === "gold" ? 18 : 8);
+    const outcome = secureRandomIndex(37);
+    const pocketIndex = ROULETTE_ORDER.indexOf(outcome);
+    const pocketAngle = pocketIndex * (360 / ROULETTE_ORDER.length);
+    rouletteRotation += 1800 + secureRandomIndex(4) * 360;
+    const desiredBallAngle = rouletteRotation + pocketAngle;
+    rouletteBallRotation -= 2520;
+    const correction = ((rouletteBallRotation - desiredBallAngle) % 360 + 360) % 360;
+    rouletteBallRotation -= correction;
     rouletteWheel.style.transform = `rotate(${rouletteRotation}deg)`;
+    rouletteBall.style.transform = `rotate(${rouletteBallRotation}deg)`;
+    rouletteBall.classList.add("is-rolling");
 
-    await wait(1180);
-    const payout = rouletteResult(rouletteChoice, outcome);
+    await wait(2450);
+    rouletteBall.classList.remove("is-rolling");
+    const payout = rouletteResult(rouletteBet, outcome);
+    const color = rouletteColor(outcome);
     if (payout > 0) {
       awardCredits(payout, `Midnight Roulette returned ${payout} free DR Credits.`);
-      setResult(rouletteResultLabel, `${outcome.toUpperCase()} — Correct call. +${payout} DR Credits`, true);
+      setResult(rouletteResultLabel, `${outcome} / ${color.toUpperCase()} — HIT. +${payout} DR Credits`, true);
     } else {
-      updateCredits("The wheel landed on the other color. No real value was lost.");
-      setResult(rouletteResultLabel, `${outcome.toUpperCase()} — Try the next roll.`);
+      updateCredits("The ball missed your bet. No real value was lost.");
+      setResult(rouletteResultLabel, `${outcome} / ${color.toUpperCase()} — The next roll is yours.`);
     }
 
     setMachineBusy(false);
@@ -436,10 +560,17 @@ document.addEventListener("DOMContentLoaded", () => {
   if (rouletteButton) rouletteButton.addEventListener("click", () => void rollRoulette());
   if (flipButton) flipButton.addEventListener("click", () => void flipChromeCoin());
 
-  rouletteChoiceButtons.forEach((button) => button.addEventListener("click", () => {
-    rouletteChoice = button.dataset.rouletteChoice;
-    chooseOption(rouletteChoiceButtons, rouletteChoice, "rouletteChoice", rouletteResultLabel, rouletteChoice[0].toUpperCase() + rouletteChoice.slice(1));
+  rouletteColorButtons.forEach((button) => button.addEventListener("click", () => {
+    rouletteBet = { type: "color", value: button.dataset.rouletteColor };
+    updateRouletteSelection();
   }));
+
+  rouletteNumberGrid?.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-roulette-number]");
+    if (!button || machineBusy) return;
+    rouletteBet = { type: "number", value: Number(button.dataset.rouletteNumber) };
+    updateRouletteSelection();
+  });
 
   flipChoiceButtons.forEach((button) => button.addEventListener("click", () => {
     flipChoice = button.dataset.flipChoice;
@@ -463,6 +594,9 @@ document.addEventListener("DOMContentLoaded", () => {
       : "Today's free credits already loaded";
   }
 
+  buildSlotMachine();
+  buildRoulette();
+  updateRouletteSelection();
   saveCredits();
   updateCredits();
   updateHolderAccess();
