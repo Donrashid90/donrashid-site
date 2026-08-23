@@ -8,6 +8,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const startButton = document.getElementById("startButton");
   const hydraulicButton = document.getElementById("hydraulicButton");
   const pauseButton = document.getElementById("pauseButton");
+  const gameCabinet = document.querySelector(".arcade-cabinet");
+  const gameFullscreenButton = document.getElementById("gameFullscreenButton");
+  const gameFullscreenLabel = document.getElementById("gameFullscreenLabel");
   const scoreValue = document.getElementById("scoreValue");
   const bestValue = document.getElementById("bestValue");
   const levelValue = document.getElementById("levelValue");
@@ -28,6 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const leaderboardList = document.getElementById("leaderboardList");
   const leaderboardStatus = document.getElementById("leaderboardStatus");
   const leaderboardRefresh = document.getElementById("leaderboardRefresh");
+  const holderLoadout = document.getElementById("holderLoadout");
 
   if (!canvas || !canvasShell) return;
 
@@ -43,107 +47,85 @@ document.addEventListener("DOMContentLoaded", () => {
   const STORAGE_KEY = "don-rashid-lowrider-night-run-best-v1";
   const NICKNAME_KEY = "don-rashid-lowrider-night-run-nickname-v1";
   const DEVICE_KEY = "don-rashid-lowrider-night-run-device-v1";
+  const HOLDER_ACCESS_KEY = "don-rashid-holder-access-v1";
+  const REWARD_LEVEL = 5;
   const LEADERBOARD_API = leaderboardRoot?.dataset.apiUrl || "";
 
-  const LEVELS = [
-    {
-      number: 1,
-      name: "Midnight Boulevard",
-      upgrade: "Factory frame / street chrome",
-      baseSpeed: 285,
-      maxSpeed: 355,
-      acceleration: 3.4,
-      spawnMin: 1.3,
-      spawnRange: .72,
-      jumpImpulse: -620,
-      patternChance: 0,
-      trafficChance: 0,
-      callout: "CLEAN JUMPS",
-      challenge: "Single road hazards. Learn the clean jump.",
-      map: "boulevard",
-      sky: ["#05070b", "#0b1b20", "#12363a", "#090b0d"],
-      accent: "#49b8bd",
-      vehicle: { top: "#242a2d", middle: "#111417", bottom: "#08090b", trim: "#edd498", glow: "#38bbc3", wheel: "#c7cecb", spokes: 8 },
-    },
-    {
-      number: 2,
-      name: "Neon Harbor",
-      upgrade: "Chrome wire wheels unlocked",
-      baseSpeed: 330,
-      maxSpeed: 410,
-      acceleration: 4,
-      spawnMin: 1.17,
-      spawnRange: .58,
-      jumpImpulse: -632,
-      patternChance: .22,
-      trafficChance: 0,
-      callout: "PAIRED HAZARDS",
-      challenge: "Harbor rain and paired cones demand longer jumps.",
-      map: "harbor",
-      sky: ["#050611", "#101638", "#133b48", "#080a12"],
-      accent: "#51cbd1",
-      vehicle: { top: "#30424b", middle: "#13242c", bottom: "#071015", trim: "#d8e4e4", glow: "#42d9df", wheel: "#eef4f2", spokes: 10 },
-    },
-    {
-      number: 3,
-      name: "Desert Interstate",
-      upgrade: "Hydraulics Stage II unlocked",
-      baseSpeed: 370,
-      maxSpeed: 455,
-      acceleration: 4.35,
-      spawnMin: 1.08,
-      spawnRange: .5,
-      jumpImpulse: -645,
-      patternChance: .34,
-      trafficChance: .05,
-      callout: "DUST COMBOS",
-      challenge: "Dust cuts visibility while mixed roadwork arrives in waves.",
-      map: "desert",
-      sky: ["#10080d", "#341725", "#6b382d", "#160d10"],
-      accent: "#e99b63",
-      vehicle: { top: "#63332b", middle: "#311615", bottom: "#0e090a", trim: "#f0c075", glow: "#dc6945", wheel: "#e8c5a2", spokes: 10 },
-    },
-    {
-      number: 4,
-      name: "Downtown Pressure",
-      upgrade: "Neon performance kit unlocked",
-      baseSpeed: 410,
-      maxSpeed: 500,
-      acceleration: 4.7,
-      spawnMin: 1,
-      spawnRange: .44,
-      jumpImpulse: -660,
-      patternChance: .47,
-      trafficChance: .18,
-      callout: "NEON TRAFFIC",
-      challenge: "Downtown traffic joins the lane and the timing window tightens.",
-      map: "downtown",
-      sky: ["#07050f", "#1c0d2d", "#172f45", "#07090e"],
-      accent: "#d55ee9",
-      vehicle: { top: "#382245", middle: "#1c1025", bottom: "#09070d", trim: "#df8cf0", glow: "#c84ee4", wheel: "#e6d8ec", spokes: 12 },
-    },
-    {
-      number: 5,
-      name: "Golden Coast",
-      upgrade: "Black-gold crown build",
-      baseSpeed: 450,
-      maxSpeed: 535,
-      acceleration: 5,
-      spawnMin: .94,
-      spawnRange: .4,
-      jumpImpulse: -675,
-      patternChance: .58,
-      trafficChance: .27,
-      callout: "TRIPLE WAVES",
-      challenge: "Triple obstacle waves guard the Golden Coast.",
-      map: "golden",
-      sky: ["#080705", "#21170c", "#634421", "#0c0906"],
-      accent: "#edd498",
-      vehicle: { top: "#332a1d", middle: "#15110c", bottom: "#050504", trim: "#f4d58b", glow: "#d6a742", wheel: "#f1d48f", spokes: 12 },
-    },
+  const DISTRICTS = [
+    ["Midnight Boulevard", "midnight-boulevard", "boulevard", "stars", "#49b8bd", ["#05070b", "#0b1b20", "#12363a", "#090b0d"], "Factory frame / street chrome", "CLEAN JUMPS", "Single road hazards. Learn the clean jump."],
+    ["Neon Harbor", "neon-harbor", "harbor", "rain", "#51cbd1", ["#050611", "#101638", "#133b48", "#080a12"], "Chrome wire wheels unlocked", "PAIRED HAZARDS", "Harbor rain and paired cones demand longer jumps."],
+    ["Desert Interstate", "desert-interstate", "desert", "dust", "#e99b63", ["#10080d", "#341725", "#6b382d", "#160d10"], "Hydraulics Stage II unlocked", "DUST COMBOS", "Dust cuts visibility while roadwork arrives in waves."],
+    ["Downtown Pressure", "downtown-pressure", "downtown", "neon", "#d55ee9", ["#07050f", "#1c0d2d", "#172f45", "#07090e"], "Neon performance kit unlocked", "NEON TRAFFIC", "Downtown traffic joins the lane and the timing window tightens."],
+    ["Golden Coast", "golden-coast", "coast", "embers", "#edd498", ["#080705", "#21170c", "#634421", "#0c0906"], "Level 5 shop reward unlocked", "REWARD RUN", "Triple waves guard the Level 5 reward — the campaign continues."],
+    ["Airport Runway", "airport-runway", "runway", "wind", "#88c8ff", ["#04070d", "#0c1d38", "#24506a", "#080b10"], "Aero skirts and runway lamps", "JET WAKE", "Runway lights hide hydrants and fast paired hazards."],
+    ["Concrete River", "concrete-river", "canal", "mist", "#86ded3", ["#04090b", "#0e2929", "#24504b", "#080d0d"], "Reinforced hydraulic bridge", "CANAL RUSH", "Concrete channels compress the view and shorten your reaction time."],
+    ["Purple Hills", "purple-hills", "hills", "haze", "#ba7cff", ["#08050e", "#251240", "#5b326b", "#100912"], "Candy-purple pearl paint", "HILL COMBOS", "Crates enter the route as the hills roll under neon haze."],
+    ["Storm Docks", "storm-docks", "harbor", "storm", "#63d7ea", ["#020509", "#0b1825", "#203e4b", "#05080b"], "Rain-cut performance tires", "DOCK THUNDER", "Lightning, dock traffic and stacked hazards test every landing."],
+    ["Metro Tunnel", "metro-tunnel", "tunnel", "sparks", "#f0cf77", ["#030303", "#11110e", "#2d2817", "#060605"], "Tunnel exhaust and gold rails", "TUNNEL VISION", "Roadblocks appear inside a narrow, high-speed tunnel."],
+    ["Casino Strip", "casino-strip", "downtown", "neon", "#ff5fd1", ["#08040c", "#2e0d33", "#55204e", "#0b060d"], "Animated boulevard underglow", "STRIP FEVER", "Bright signs distract from rapid mixed patterns."],
+    ["Oil District", "oil-district", "industrial", "smoke", "#f0a35d", ["#090706", "#241611", "#493127", "#0d0907"], "Heavy-duty chrome chassis", "INDUSTRIAL HEAT", "Police cruisers and heavy barriers now occupy the lane."],
+    ["Canyon Fire", "canyon-fire", "desert", "embers", "#ff744f", ["#120405", "#3d1010", "#7c2e1e", "#160706"], "Fireline suspension package", "CANYON BURN", "Embers mask aggressive three-part canyon combinations."],
+    ["Border Run", "border-run", "border", "dust", "#f4d58b", ["#0c0905", "#312512", "#6a5129", "#120d07"], "Long-travel hydraulic cylinders", "CHECKPOINT DASH", "Barricades, crates and patrol cars leave little open asphalt."],
+    ["Freeway Stack", "freeway-stack", "freeway", "rain", "#78b7ff", ["#03060b", "#111d32", "#273e5c", "#06090e"], "Stage III turbo hydraulics", "STACK ATTACK", "Broken freeway gaps demand full jumps at maximum traffic speed."],
+    ["Ghost Town", "ghost-town", "desert", "fog", "#c7b7a2", ["#080706", "#1e1a17", "#403932", "#0c0a09"], "Phantom silver bodywork", "NO LIGHTS", "Fog swallows the road while silent obstacles emerge late."],
+    ["Electric Storm", "electric-storm", "downtown", "storm", "#8c7dff", ["#04030d", "#15123a", "#28265f", "#06050f"], "Electric violet crown kit", "HIGH VOLTAGE", "Neon gates and lightning turn every pattern into a reflex test."],
+    ["Pacific Cliffs", "pacific-cliffs", "coast", "wind", "#54d5d0", ["#03090d", "#103343", "#286572", "#061015"], "Cliffline aero package", "EDGE CONTROL", "Long gaps and crosswinds punish early jumps."],
+    ["Crown City", "crown-city", "crown", "neon", "#f4d58b", ["#080602", "#271a08", "#5a3e13", "#0c0904"], "Royal wire wheels / 16 spokes", "CROWN PRESSURE", "Elite traffic and neon gates arrive in relentless waves."],
+    ["Final Boulevard", "final-boulevard", "finale", "sparks", "#ffe09a", ["#050403", "#1b1207", "#543512", "#090603"], "Don Rashid championship build", "FINAL NIGHT", "Every obstacle returns at full speed. Own the final boulevard."],
   ];
 
+  const VEHICLE_PALETTES = [
+    ["#242a2d", "#111417", "#08090b"],
+    ["#30424b", "#13242c", "#071015"],
+    ["#63332b", "#311615", "#0e090a"],
+    ["#382245", "#1c1025", "#09070d"],
+    ["#332a1d", "#15110c", "#050504"],
+  ];
+
+  const LEVELS = DISTRICTS.map((district, index) => {
+    const number = index + 1;
+    const palette = VEHICLE_PALETTES[index % VEHICLE_PALETTES.length];
+    const baseSpeed = 285 + Math.min(index, 4) * 35 + Math.max(0, index - 4) * 10;
+    return {
+      number,
+      name: district[0],
+      map: district[1],
+      scene: district[2],
+      weather: district[3],
+      accent: district[4],
+      sky: district[5],
+      upgrade: district[6],
+      callout: district[7],
+      challenge: district[8],
+      baseSpeed,
+      maxSpeed: baseSpeed + 72 + Math.min(24, index * 1.3),
+      acceleration: 3.4 + index * .12,
+      spawnMin: Math.max(.7, 1.3 - Math.min(index, 4) * .08 - Math.max(0, index - 4) * .019),
+      spawnRange: Math.max(.27, .72 - Math.min(index, 4) * .08 - Math.max(0, index - 4) * .008),
+      jumpImpulse: -620 - Math.min(72, index * 3.8),
+      patternChance: Math.min(.84, index * .15),
+      vehicle: {
+        top: palette[0],
+        middle: palette[1],
+        bottom: palette[2],
+        trim: index >= 4 ? "#f4d58b" : index >= 1 ? "#d8e4e4" : "#edd498",
+        glow: district[4],
+        wheel: index >= 18 ? "#f4d58b" : "#e3e9e6",
+        spokes: Math.min(16, 8 + Math.floor(index / 2)),
+      },
+    };
+  });
+
   const FINAL_LEVEL = LEVELS.length;
+  const holderAccess = readHolderAccess();
+  const holderMinimum = Math.max(0, Number(holderAccess?.minimum) || 0);
+  document.body.dataset.holderTier = holderMinimum >= 1000
+    ? "crown-access"
+    : holderMinimum >= 500
+      ? "neon-access"
+      : holderMinimum >= 100
+        ? "chrome-access"
+        : "street-access";
 
   let mode = "idle";
   let lastTime = 0;
@@ -203,6 +185,17 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  function readHolderAccess() {
+    try {
+      const stored = JSON.parse(localStorage.getItem(HOLDER_ACCESS_KEY) || "null");
+      if (!stored || !Number.isFinite(Number(stored.minimum)) || !Number.isFinite(Number(stored.verifiedAt))) return null;
+      if (Date.now() - Number(stored.verifiedAt) > 30 * 24 * 60 * 60 * 1000) return null;
+      return stored;
+    } catch (error) {
+      return null;
+    }
+  }
+
   function saveBest(value) {
     try {
       localStorage.setItem(STORAGE_KEY, String(value));
@@ -240,7 +233,37 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function getLevelConfig() {
-    return LEVELS[Math.max(0, Math.min(FINAL_LEVEL - 1, currentLevel - 1))];
+    const base = LEVELS[Math.max(0, Math.min(FINAL_LEVEL - 1, currentLevel - 1))];
+    const neonMap = holderMinimum >= 500 && base.number === 10;
+    const crownBuild = holderMinimum >= 1000;
+    const chromeBuild = holderMinimum >= 100;
+    const vehicle = chromeBuild
+      ? {
+          ...base.vehicle,
+          top: crownBuild ? "#3a2c14" : "#775826",
+          middle: crownBuild ? "#171006" : "#35240f",
+          bottom: "#050403",
+          trim: "#ffe09a",
+          glow: holderMinimum >= 500 ? "#45efe2" : "#d6a742",
+          wheel: "#f6dc9b",
+          spokes: crownBuild ? 16 : Math.max(12, base.vehicle.spokes),
+        }
+      : base.vehicle;
+
+    if (!neonMap && !chromeBuild) return base;
+    return {
+      ...base,
+      ...(neonMap ? {
+        name: "VIP Neon Strip",
+        map: "vip-neon-strip",
+        scene: "downtown",
+        weather: "neon",
+        accent: "#45efe2",
+        sky: ["#03060a", "#08262d", "#173f49", "#05090b"],
+        callout: "HOLDER EXCLUSIVE",
+      } : {}),
+      vehicle,
+    };
   }
 
   function resetPromoReward() {
@@ -251,6 +274,7 @@ document.addEventListener("DOMContentLoaded", () => {
       copyPromoButton.disabled = true;
       copyPromoButton.textContent = "Copy code";
       copyPromoButton.dataset.code = "";
+      copyPromoButton.dataset.retry = "";
     }
     if (promoShopLink) promoShopLink.href = "https://shop.donrashid.com";
     canvasShell.classList.remove("has-reward");
@@ -358,7 +382,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const runId = await currentRunPromise;
     if (!runId || sequence !== runSequence) return null;
 
-    for (let attempt = 0; attempt < 2; attempt += 1) {
+    for (let attempt = 0; attempt < 4; attempt += 1) {
       try {
         return await requestLeaderboard({
           method: "POST",
@@ -371,8 +395,8 @@ document.addEventListener("DOMContentLoaded", () => {
           }),
         });
       } catch (error) {
-        if (attempt === 0) {
-          await new Promise((resolve) => window.setTimeout(resolve, 250));
+        if (attempt < 3) {
+          await new Promise((resolve) => window.setTimeout(resolve, 250 * (attempt + 1)));
         }
       }
     }
@@ -386,14 +410,25 @@ document.addEventListener("DOMContentLoaded", () => {
     canvasShell.classList.add("has-reward");
     resizeCanvas();
 
-    const [runId, checkpoint] = await Promise.all([
-      currentRunPromise,
-      levelCheckpointPromise,
-    ]);
+    const runId = await currentRunPromise;
+    let checkpoint = await levelCheckpointPromise;
+
+    if (runId && !checkpoint && sequence === runSequence && currentLevel === REWARD_LEVEL + 1) {
+      levelCheckpointPromise = reportLevelCheckpoint(
+        REWARD_LEVEL,
+        sequence,
+        Math.floor(score),
+        Math.floor(elapsed * 1000),
+      );
+      checkpoint = await levelCheckpointPromise;
+    }
 
     if (!runId || !checkpoint || sequence !== runSequence) {
       promoCode.textContent = "NOT VERIFIED";
-      promoRewardStatus.textContent = "The reward server could not verify this run. Your score still counts.";
+      promoRewardStatus.textContent = "The reward server could not verify this run yet. Tap retry to check again.";
+      copyPromoButton.dataset.retry = "true";
+      copyPromoButton.textContent = "Retry reward";
+      copyPromoButton.disabled = false;
       return;
     }
 
@@ -413,8 +448,9 @@ document.addEventListener("DOMContentLoaded", () => {
       promoCode.textContent = payload.code;
       promoRewardStatus.textContent = payload.returning
         ? "Your previously unlocked one-time code is ready."
-        : "You cleared all five levels. Your one-time code is ready.";
+        : "You cleared Level 5. Your one-time code is ready.";
       copyPromoButton.dataset.code = payload.code;
+      copyPromoButton.dataset.retry = "";
       copyPromoButton.disabled = false;
       if (promoShopLink && typeof payload.promoUrl === "string") {
         try {
@@ -431,11 +467,21 @@ document.addEventListener("DOMContentLoaded", () => {
       promoRewardStatus.textContent = error instanceof Error
         ? error.message
         : "The limited reward could not be issued right now.";
+      copyPromoButton.dataset.retry = "true";
+      copyPromoButton.textContent = "Retry reward";
+      copyPromoButton.disabled = false;
     }
   }
 
   async function copyPromoCode() {
     if (!copyPromoButton) return;
+    if (copyPromoButton.dataset.retry === "true") {
+      copyPromoButton.disabled = true;
+      copyPromoButton.textContent = "Verifying…";
+      copyPromoButton.dataset.retry = "";
+      await claimLevelReward(runSequence);
+      return;
+    }
     const code = copyPromoButton.dataset.code || "";
     if (!code) return;
 
@@ -519,12 +565,77 @@ document.addEventListener("DOMContentLoaded", () => {
     drawScene();
   }
 
+  function nativeFullscreenElement() {
+    return document.fullscreenElement || document.webkitFullscreenElement || null;
+  }
+
+  function gameIsFullscreen() {
+    return nativeFullscreenElement() === gameCabinet || gameCabinet?.classList.contains("is-pseudo-fullscreen");
+  }
+
+  function updateGameFullscreenButton() {
+    const active = gameIsFullscreen();
+    if (gameFullscreenLabel) gameFullscreenLabel.textContent = active ? "Exit fullscreen" : "Fullscreen";
+    if (gameFullscreenButton) {
+      gameFullscreenButton.setAttribute("aria-pressed", String(active));
+      gameFullscreenButton.setAttribute("aria-label", active ? "Exit game fullscreen" : "Open game fullscreen");
+    }
+    window.requestAnimationFrame(resizeCanvas);
+  }
+
+  function openPseudoGameFullscreen() {
+    if (!gameCabinet) return;
+    gameCabinet.classList.add("is-pseudo-fullscreen");
+    document.body.classList.add("game-fullscreen-lock");
+    updateGameFullscreenButton();
+  }
+
+  function closePseudoGameFullscreen() {
+    if (!gameCabinet?.classList.contains("is-pseudo-fullscreen")) return;
+    gameCabinet.classList.remove("is-pseudo-fullscreen");
+    document.body.classList.remove("game-fullscreen-lock");
+    updateGameFullscreenButton();
+  }
+
+  async function toggleGameFullscreen() {
+    if (!gameCabinet) return;
+
+    if (gameCabinet.classList.contains("is-pseudo-fullscreen")) {
+      closePseudoGameFullscreen();
+      return;
+    }
+
+    if (nativeFullscreenElement() === gameCabinet) {
+      const exit = document.exitFullscreen || document.webkitExitFullscreen;
+      if (exit) await exit.call(document);
+      return;
+    }
+
+    const request = gameCabinet.requestFullscreen || gameCabinet.webkitRequestFullscreen;
+    if (!request) {
+      openPseudoGameFullscreen();
+      return;
+    }
+
+    try {
+      await request.call(gameCabinet);
+      await new Promise((resolve) => window.requestAnimationFrame(resolve));
+      if (nativeFullscreenElement() !== gameCabinet) openPseudoGameFullscreen();
+      else updateGameFullscreenButton();
+    } catch (error) {
+      openPseudoGameFullscreen();
+    }
+  }
+
   function setOverlay({ kicker, title, text, button }) {
     resetPromoReward();
     if (overlayKicker) overlayKicker.textContent = kicker;
     if (overlayTitle) overlayTitle.innerHTML = title;
     if (overlayText) overlayText.textContent = text;
-    if (startButton) startButton.firstChild.textContent = `${button} `;
+    if (startButton) {
+      startButton.disabled = false;
+      startButton.firstChild.textContent = `${button} `;
+    }
     if (overlay) overlay.classList.add("is-visible");
   }
 
@@ -611,15 +722,28 @@ document.addEventListener("DOMContentLoaded", () => {
       currentLevel += 1;
       levelElapsed = 0;
       const nextLevel = getLevelConfig();
-      if (runStatus) runStatus.textContent = `Upgrade unlocked — ${completedConfig.upgrade}`;
+      const rewardMilestone = completedLevel === REWARD_LEVEL;
+      if (runStatus) runStatus.textContent = rewardMilestone
+        ? "Level 5 cleared — shop reward unlocked"
+        : `Upgrade unlocked — ${completedConfig.upgrade}`;
       setOverlay({
-        kicker: `Level ${completedLevel} complete / Upgrade installed`,
+        kicker: rewardMilestone
+          ? "Level 5 complete / Reward unlocked"
+          : `Level ${completedLevel} complete / Upgrade installed`,
         title: `LEVEL ${currentLevel}<br /><em>${nextLevel.name.replace(" ", "<br />")}</em>`,
-        text: `${completedConfig.upgrade}. ${nextLevel.challenge}`,
+        text: rewardMilestone
+          ? `Your limited shop reward is being verified. Then continue into ${nextLevel.name}.`
+          : `${completedConfig.upgrade}. ${nextLevel.challenge}`,
         button: `Start Level ${currentLevel}`,
       });
       updateHud();
       drawScene();
+      if (rewardMilestone) {
+        if (startButton) startButton.disabled = true;
+        void claimLevelReward(sequence).finally(() => {
+          if (startButton && mode === "levelcomplete") startButton.disabled = false;
+        });
+      }
       return;
     }
 
@@ -636,16 +760,15 @@ document.addEventListener("DOMContentLoaded", () => {
       saveBest(best);
     }
     if (pauseButton) pauseButton.disabled = true;
-    if (runStatus) runStatus.textContent = "All five levels complete — reward unlocked";
+    if (runStatus) runStatus.textContent = "All 20 levels complete — boulevard conquered";
     setOverlay({
-      kicker: "Level 5 complete / Coast conquered",
-      title: "YOU OWN<br /><em>THE COAST</em>",
-      text: `${formatScore(finalScore)} points. Your limited shop reward is being verified.`,
+      kicker: "Level 20 complete / Campaign conquered",
+      title: "YOU OWN<br /><em>THE NIGHT</em>",
+      text: `${formatScore(finalScore)} points across all 20 districts. Your final score is ready for the worldwide board.`,
       button: "Run it back",
     });
     updateHud();
     drawScene();
-    void claimLevelReward(sequence);
     void offerWorldwideScore(finalScore, finalDurationMs, FINAL_LEVEL, sequence);
   }
 
@@ -769,29 +892,31 @@ document.addEventListener("DOMContentLoaded", () => {
     barrier: { width: 56, height: 52, points: 45 },
     drum: { width: 44, height: 58, points: 55 },
     traffic: { width: 112, height: 46, points: 90 },
+    hydrant: { width: 38, height: 55, points: 70 },
+    crate: { width: 62, height: 52, points: 85 },
+    roadblock: { width: 94, height: 58, points: 110 },
+    police: { width: 126, height: 50, points: 140 },
+    gap: { width: 122, height: 16, points: 150 },
+    gate: { width: 54, height: 72, points: 175 },
   };
 
-  const OBSTACLE_PATTERNS = {
-    2: [
-      [{ kind: "cone", offset: 0 }, { kind: "cone", offset: 92 }],
-      [{ kind: "pothole", offset: 0 }, { kind: "cone", offset: 138 }],
-    ],
-    3: [
-      [{ kind: "drum", offset: 0 }, { kind: "cone", offset: 118 }],
-      [{ kind: "cone", offset: 0 }, { kind: "pothole", offset: 142 }],
-      [{ kind: "barrier", offset: 0 }, { kind: "cone", offset: 138 }],
-    ],
-    4: [
-      [{ kind: "pothole", offset: 0 }, { kind: "drum", offset: 156 }],
-      [{ kind: "barrier", offset: 0 }, { kind: "cone", offset: 146 }],
-      [{ kind: "cone", offset: 0 }, { kind: "traffic", offset: 168 }],
-    ],
-    5: [
-      [{ kind: "cone", offset: 0 }, { kind: "cone", offset: 86 }, { kind: "pothole", offset: 204 }],
-      [{ kind: "drum", offset: 0 }, { kind: "barrier", offset: 132 }, { kind: "cone", offset: 232 }],
-      [{ kind: "pothole", offset: 0 }, { kind: "traffic", offset: 170 }, { kind: "cone", offset: 324 }],
-    ],
-  };
+  const OBSTACLE_PATTERNS = [
+    { minimum: 2, items: [{ kind: "cone", offset: 0 }, { kind: "cone", offset: 92 }] },
+    { minimum: 2, items: [{ kind: "pothole", offset: 0 }, { kind: "cone", offset: 138 }] },
+    { minimum: 3, items: [{ kind: "drum", offset: 0 }, { kind: "cone", offset: 118 }] },
+    { minimum: 4, items: [{ kind: "barrier", offset: 0 }, { kind: "traffic", offset: 168 }] },
+    { minimum: 5, items: [{ kind: "cone", offset: 0 }, { kind: "cone", offset: 88 }, { kind: "pothole", offset: 212 }] },
+    { minimum: 6, items: [{ kind: "hydrant", offset: 0 }, { kind: "barrier", offset: 142 }] },
+    { minimum: 8, items: [{ kind: "crate", offset: 0 }, { kind: "cone", offset: 136 }, { kind: "hydrant", offset: 238 }] },
+    { minimum: 10, items: [{ kind: "roadblock", offset: 0 }, { kind: "pothole", offset: 178 }] },
+    { minimum: 12, items: [{ kind: "police", offset: 0 }, { kind: "crate", offset: 188 }] },
+    { minimum: 14, items: [{ kind: "hydrant", offset: 0 }, { kind: "roadblock", offset: 132 }, { kind: "cone", offset: 270 }] },
+    { minimum: 15, items: [{ kind: "gap", offset: 0 }, { kind: "barrier", offset: 202 }] },
+    { minimum: 17, items: [{ kind: "gate", offset: 0 }, { kind: "police", offset: 164 }] },
+    { minimum: 18, items: [{ kind: "gap", offset: 0 }, { kind: "gate", offset: 194 }, { kind: "crate", offset: 324 }] },
+    { minimum: 19, items: [{ kind: "police", offset: 0 }, { kind: "roadblock", offset: 178 }, { kind: "hydrant", offset: 318 }] },
+    { minimum: 20, items: [{ kind: "gate", offset: 0 }, { kind: "gap", offset: 150 }, { kind: "police", offset: 352 }] },
+  ];
 
   function addObstacle(kind, offset = 0) {
     const dimensions = OBSTACLE_DIMENSIONS[kind] || OBSTACLE_DIMENSIONS.cone;
@@ -806,19 +931,24 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function randomObstacleKind(level) {
-    const roll = Math.random();
-    if (level.number >= 4 && roll < level.trafficChance) return "traffic";
-    if (level.number >= 3 && roll < level.trafficChance + .16) return "drum";
-    const roadRoll = Math.random();
-    return roadRoll < .4 ? "cone" : roadRoll < .7 ? "pothole" : "barrier";
+    const choices = ["cone", "pothole", "barrier"];
+    if (level.number >= 3) choices.push("drum");
+    if (level.number >= 4) choices.push("traffic");
+    if (level.number >= 6) choices.push("hydrant");
+    if (level.number >= 8) choices.push("crate");
+    if (level.number >= 10) choices.push("roadblock");
+    if (level.number >= 12) choices.push("police");
+    if (level.number >= 15) choices.push("gap");
+    if (level.number >= 17) choices.push("gate");
+    return choices[Math.floor(Math.random() * choices.length)];
   }
 
   function spawnObstacle() {
     const level = getLevelConfig();
-    const patterns = OBSTACLE_PATTERNS[level.number] || [];
+    const patterns = OBSTACLE_PATTERNS.filter((pattern) => pattern.minimum <= level.number);
 
     if (patterns.length && Math.random() < level.patternChance) {
-      const pattern = patterns[Math.floor(Math.random() * patterns.length)];
+      const pattern = patterns[Math.floor(Math.random() * patterns.length)].items;
       pattern.forEach((item) => addObstacle(item.kind, item.offset));
       const lastOffset = pattern.reduce((largest, item) => Math.max(largest, item.offset), 0);
       return .34 + (lastOffset / Math.max(speed, 1)) * .55;
@@ -911,13 +1041,20 @@ document.addEventListener("DOMContentLoaded", () => {
       const obstacle = obstacles[index];
       obstacle.x -= speed * dt;
 
-      const obstacleY = obstacle.kind === "pothole" ? GROUND_Y - 8 : GROUND_Y - obstacle.height + 3;
+      const isGroundHazard = ["pothole", "gap"].includes(obstacle.kind);
+      const obstacleY = isGroundHazard ? GROUND_Y - 8 : GROUND_Y - obstacle.height + 3;
       const insets = {
         cone: { x: 6, y: 7, width: 12, height: 10 },
         pothole: { x: 12, y: 3, width: 24, height: 6 },
         barrier: { x: 7, y: 7, width: 14, height: 12 },
         drum: { x: 6, y: 5, width: 12, height: 9 },
         traffic: { x: 12, y: 10, width: 24, height: 15 },
+        hydrant: { x: 7, y: 6, width: 14, height: 10 },
+        crate: { x: 6, y: 5, width: 12, height: 9 },
+        roadblock: { x: 8, y: 7, width: 16, height: 12 },
+        police: { x: 14, y: 10, width: 28, height: 15 },
+        gap: { x: 10, y: 3, width: 20, height: 6 },
+        gate: { x: 8, y: 6, width: 16, height: 10 },
       }[obstacle.kind] || { x: 5, y: 5, width: 10, height: 8 };
       const hitbox = {
         x: obstacle.x + insets.x,
@@ -926,7 +1063,7 @@ document.addEventListener("DOMContentLoaded", () => {
         height: Math.max(7, obstacle.height - insets.height),
       };
 
-      const hasHit = obstacle.kind === "pothole"
+      const hasHit = isGroundHazard
         ? player.grounded && overlapsHorizontally(car, hitbox)
         : overlaps(car, hitbox);
 
@@ -938,7 +1075,9 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!obstacle.counted && obstacle.x + obstacle.width < player.x) {
         obstacle.counted = true;
         score += obstacle.points || 35;
-        if (obstacle.kind === "traffic") showAnnouncement("+90 NEON TRAFFIC CLEAR");
+        if (["traffic", "police", "gate", "gap"].includes(obstacle.kind)) {
+          showAnnouncement(`+${obstacle.points} ${obstacle.kind.toUpperCase()} CLEAR`);
+        }
       }
 
       if (obstacle.x + obstacle.width < -100) obstacles.splice(index, 1);
@@ -1003,6 +1142,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function drawSky() {
     const level = getLevelConfig();
+    const warmScene = ["desert", "coast", "border", "finale", "crown"].includes(level.scene);
+    const neonScene = ["downtown", "tunnel", "crown"].includes(level.scene);
     const sky = ctx.createLinearGradient(0, 0, 0, VIEW_H);
     sky.addColorStop(0, level.sky[0]);
     sky.addColorStop(.48, level.sky[1]);
@@ -1011,27 +1152,27 @@ document.addEventListener("DOMContentLoaded", () => {
     ctx.fillStyle = sky;
     ctx.fillRect(0, 0, VIEW_W, VIEW_H);
 
-    const celestialX = level.map === "desert" ? 720 : level.map === "golden" ? 790 : 755;
-    const celestialY = level.map === "golden" ? 205 : 145;
-    const glow = ctx.createRadialGradient(celestialX, celestialY, 8, celestialX, celestialY, level.map === "golden" ? 220 : 155);
-    glow.addColorStop(0, level.map === "downtown" ? "rgba(214, 94, 233, .2)" : "rgba(237, 212, 152, .25)");
-    glow.addColorStop(.2, level.map === "desert" ? "rgba(226, 115, 68, .14)" : "rgba(203, 162, 91, .1)");
+    const celestialX = level.scene === "desert" ? 720 : warmScene ? 790 : 755;
+    const celestialY = warmScene ? 195 : 145;
+    const glow = ctx.createRadialGradient(celestialX, celestialY, 8, celestialX, celestialY, warmScene ? 220 : 155);
+    glow.addColorStop(0, neonScene ? `${level.accent}38` : "rgba(237, 212, 152, .25)");
+    glow.addColorStop(.2, level.scene === "desert" ? "rgba(226, 115, 68, .14)" : `${level.accent}20`);
     glow.addColorStop(1, "rgba(203, 162, 91, 0)");
     ctx.fillStyle = glow;
     ctx.fillRect(celestialX - 220, 0, 440, 390);
 
-    ctx.fillStyle = level.map === "desert"
+    ctx.fillStyle = level.scene === "desert"
       ? "rgba(242, 139, 79, .84)"
-      : level.map === "downtown"
-        ? "rgba(218, 163, 234, .74)"
+      : neonScene
+        ? `${level.accent}bd`
         : "rgba(237, 212, 152, .82)";
     ctx.beginPath();
-    ctx.arc(celestialX, celestialY, level.map === "golden" ? 38 : 24, 0, Math.PI * 2);
+    ctx.arc(celestialX, celestialY, warmScene ? 36 : 24, 0, Math.PI * 2);
     ctx.fill();
 
     stars.forEach((star) => {
       const twinkle = .72 + Math.sin(elapsed * 1.3 + star.x) * .28;
-      const visibility = ["desert", "golden"].includes(level.map) ? .68 : 1;
+      const visibility = warmScene ? .68 : 1;
       ctx.globalAlpha = star.alpha * twinkle * visibility;
       ctx.fillStyle = "#f3f0e9";
       ctx.beginPath();
@@ -1240,11 +1381,146 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  function drawRunway() {
+    drawSkyline();
+    const offset = -((distance * .34) % 150);
+    for (let x = offset - 150; x < VIEW_W + 150; x += 150) {
+      ctx.fillStyle = "rgba(136, 200, 255, .72)";
+      ctx.beginPath();
+      ctx.arc(x, ROAD_TOP - 7, 3, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.strokeStyle = "rgba(216, 229, 234, .32)";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(0, 335);
+    ctx.lineTo(VIEW_W, 335);
+    ctx.stroke();
+  }
+
+  function drawCanal() {
+    const offset = -((distance * .13) % 520);
+    ctx.fillStyle = "rgba(5, 17, 18, .9)";
+    ctx.beginPath();
+    ctx.moveTo(0, 294);
+    ctx.lineTo(VIEW_W, 322);
+    ctx.lineTo(VIEW_W, ROAD_TOP);
+    ctx.lineTo(0, ROAD_TOP);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = "rgba(134, 222, 211, .28)";
+    ctx.lineWidth = 2;
+    for (let x = offset - 520; x < VIEW_W + 520; x += 130) {
+      ctx.beginPath();
+      ctx.moveTo(x, 315);
+      ctx.lineTo(x + 96, ROAD_TOP);
+      ctx.stroke();
+    }
+  }
+
+  function drawHills() {
+    const offset = -((distance * .055) % 1080);
+    for (let repeat = -1; repeat < 3; repeat += 1) {
+      const x = offset + repeat * 1080;
+      ctx.fillStyle = "rgba(18, 7, 27, .84)";
+      ctx.beginPath();
+      ctx.moveTo(x - 90, ROAD_TOP);
+      ctx.quadraticCurveTo(x + 130, 190, x + 350, ROAD_TOP);
+      ctx.quadraticCurveTo(x + 560, 245, x + 800, ROAD_TOP);
+      ctx.closePath();
+      ctx.fill();
+    }
+    drawPalms();
+  }
+
+  function drawTunnel() {
+    ctx.fillStyle = "rgba(2, 2, 2, .76)";
+    ctx.fillRect(0, 0, VIEW_W, ROAD_TOP);
+    const offset = -((distance * .26) % 235);
+    for (let x = offset - 235; x < VIEW_W + 235; x += 235) {
+      ctx.strokeStyle = "rgba(240, 207, 119, .22)";
+      ctx.lineWidth = 8;
+      ctx.beginPath();
+      ctx.moveTo(x, ROAD_TOP);
+      ctx.lineTo(x, 105);
+      ctx.quadraticCurveTo(x + 115, 28, x + 230, 105);
+      ctx.lineTo(x + 230, ROAD_TOP);
+      ctx.stroke();
+      ctx.fillStyle = "rgba(240, 207, 119, .72)";
+      ctx.fillRect(x + 82, 84, 67, 4);
+    }
+  }
+
+  function drawIndustrial() {
+    drawHarbor();
+    const offset = -((distance * .09) % 680);
+    for (let repeat = -1; repeat < 4; repeat += 1) {
+      const x = offset + repeat * 680 + 260;
+      ctx.fillStyle = "rgba(5, 5, 6, .94)";
+      ctx.fillRect(x, 190, 38, 180);
+      ctx.fillRect(x + 8, 164, 22, 28);
+      ctx.fillRect(x + 170, 238, 110, 132);
+      ctx.strokeStyle = "rgba(240, 163, 93, .38)";
+      ctx.strokeRect(x + 184, 251, 80, 45);
+    }
+  }
+
+  function drawBorder() {
+    drawDesert();
+    const offset = -((distance * .14) % 760);
+    for (let repeat = -1; repeat < 3; repeat += 1) {
+      const x = offset + repeat * 760 + 330;
+      ctx.strokeStyle = "rgba(244, 213, 139, .38)";
+      ctx.lineWidth = 5;
+      ctx.strokeRect(x, 247, 218, 123);
+      ctx.fillStyle = "rgba(7, 7, 7, .82)";
+      ctx.fillRect(x + 45, 271, 128, 34);
+      ctx.fillStyle = "#f4d58b";
+      ctx.font = "700 11px Space Grotesk, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("DR CHECKPOINT", x + 109, 292);
+    }
+  }
+
+  function drawFreeway() {
+    drawSkyline();
+    const offset = -((distance * .12) % 720);
+    for (let repeat = -1; repeat < 4; repeat += 1) {
+      const x = offset + repeat * 720;
+      ctx.fillStyle = "rgba(5, 7, 11, .94)";
+      ctx.fillRect(x, 264, 610, 22);
+      ctx.fillRect(x + 85, 286, 19, 84);
+      ctx.fillRect(x + 495, 286, 19, 84);
+      ctx.strokeStyle = "rgba(120, 183, 255, .22)";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(x + 22, 266, 180, 16);
+    }
+  }
+
+  function drawDistrictMarker() {
+    const level = getLevelConfig();
+    const markerOffset = -((distance * .1) % 890);
+    for (let repeat = -1; repeat < 3; repeat += 1) {
+      const x = markerOffset + repeat * 890 + 610;
+      ctx.save();
+      ctx.fillStyle = "rgba(4, 5, 7, .76)";
+      ctx.strokeStyle = `${level.accent}73`;
+      ctx.lineWidth = 1.5;
+      ctx.fillRect(x, 245, 174, 58);
+      ctx.strokeRect(x, 245, 174, 58);
+      ctx.fillStyle = level.accent;
+      ctx.font = "700 10px Space Grotesk, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(`L${String(level.number).padStart(2, "0")} · ${level.name.toUpperCase()}`, x + 87, 278);
+      ctx.restore();
+    }
+  }
+
   function drawLevelAtmosphere() {
     const level = getLevelConfig();
     ctx.save();
 
-    if (level.map === "harbor") {
+    if (["rain", "storm"].includes(level.weather)) {
       ctx.strokeStyle = "rgba(122, 219, 225, .2)";
       ctx.lineWidth = 1.2;
       for (let index = 0; index < 30; index += 1) {
@@ -1257,14 +1533,18 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    if (level.map === "desert") {
+    if (["dust", "haze", "mist", "smoke", "fog"].includes(level.weather)) {
       for (let index = 0; index < 24; index += 1) {
         const span = VIEW_W + 120;
         const rawX = (index * 127 - distance * .22) % span;
         const x = (rawX + span) % span - 60;
         const y = 255 + ((index * 41) % 205) + Math.sin(elapsed * 1.8 + index) * 9;
         ctx.globalAlpha = .12 + (index % 5) * .025;
-        ctx.fillStyle = index % 3 === 0 ? "#f0c075" : "#c06f49";
+        ctx.fillStyle = level.weather === "fog"
+          ? "#d8d5ce"
+          : level.weather === "smoke"
+            ? "#8f8177"
+            : index % 3 === 0 ? "#f0c075" : level.accent;
         ctx.beginPath();
         ctx.arc(x, y, 1.2 + (index % 4) * .45, 0, Math.PI * 2);
         ctx.fill();
@@ -1272,7 +1552,7 @@ document.addEventListener("DOMContentLoaded", () => {
       ctx.globalAlpha = 1;
     }
 
-    if (level.map === "downtown") {
+    if (["neon", "sparks"].includes(level.weather)) {
       for (let index = 0; index < 7; index += 1) {
         const span = VIEW_W + 220;
         const rawX = (index * 181 - distance * (1.12 + index * .02)) % span;
@@ -1280,18 +1560,18 @@ document.addEventListener("DOMContentLoaded", () => {
         const y = 384 + (index % 3) * 29;
         const trail = ctx.createLinearGradient(x, y, x + 96, y);
         trail.addColorStop(0, "rgba(213, 94, 233, 0)");
-        trail.addColorStop(1, index % 2 ? "rgba(73, 184, 189, .38)" : "rgba(213, 94, 233, .42)");
+        trail.addColorStop(1, index % 2 ? `${level.accent}61` : "rgba(237, 212, 152, .42)");
         ctx.fillStyle = trail;
         ctx.fillRect(x, y, 96, 2);
       }
     }
 
-    if (level.map === "golden") {
+    if (["embers", "wind", "sparks"].includes(level.weather)) {
       for (let index = 0; index < 18; index += 1) {
         const x = (index * 151 + distance * .13) % (VIEW_W + 80) - 40;
         const y = 250 + ((index * 47) % 185) + Math.sin(elapsed * 2.2 + index) * 8;
         ctx.globalAlpha = .18 + (index % 4) * .06;
-        ctx.fillStyle = "#f4d58b";
+        ctx.fillStyle = level.weather === "wind" ? "#d7e8e8" : level.accent;
         ctx.beginPath();
         ctx.arc(x, y, 1 + (index % 3) * .55, 0, Math.PI * 2);
         ctx.fill();
@@ -1299,36 +1579,58 @@ document.addEventListener("DOMContentLoaded", () => {
       ctx.globalAlpha = 1;
     }
 
+    if (level.weather === "storm" && Math.sin(elapsed * 4.7 + currentLevel) > .94) {
+      ctx.fillStyle = "rgba(222, 235, 255, .12)";
+      ctx.fillRect(0, 0, VIEW_W, VIEW_H);
+    }
+
     ctx.restore();
   }
 
   function drawBackdrop() {
-    const map = getLevelConfig().map;
-    if (map === "boulevard") {
+    const level = getLevelConfig();
+    const scene = level.scene;
+    if (scene === "boulevard") {
       drawSkyline();
       drawPalms();
-      return;
-    }
-    if (map === "harbor") {
+    } else if (scene === "harbor") {
       drawHarbor();
-      return;
-    }
-    if (map === "desert") {
+    } else if (scene === "desert") {
       drawDesert();
-      return;
-    }
-    if (map === "downtown") {
+    } else if (scene === "downtown") {
       drawSkyline();
       drawDowntownNeon();
-      return;
+    } else if (scene === "coast") {
+      drawGoldenCoast();
+    } else if (scene === "runway") {
+      drawRunway();
+    } else if (scene === "canal") {
+      drawCanal();
+    } else if (scene === "hills") {
+      drawHills();
+    } else if (scene === "tunnel") {
+      drawTunnel();
+    } else if (scene === "industrial") {
+      drawIndustrial();
+    } else if (scene === "border") {
+      drawBorder();
+    } else if (scene === "freeway") {
+      drawFreeway();
+    } else if (scene === "crown") {
+      drawSkyline();
+      drawDowntownNeon();
+      drawPalms();
+    } else {
+      drawGoldenCoast();
+      drawSkyline();
     }
-    drawGoldenCoast();
+    drawDistrictMarker();
   }
 
   function drawRoad() {
     const level = getLevelConfig();
     const road = ctx.createLinearGradient(0, ROAD_TOP, 0, VIEW_H);
-    road.addColorStop(0, level.map === "desert" ? "#241917" : level.map === "golden" ? "#211a10" : "#14191b");
+    road.addColorStop(0, ["desert", "border"].includes(level.scene) ? "#241917" : ["coast", "crown", "finale"].includes(level.scene) ? "#211a10" : "#14191b");
     road.addColorStop(.45, "#090b0d");
     road.addColorStop(1, "#050607");
     ctx.fillStyle = road;
@@ -1338,7 +1640,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ctx.fillRect(0, ROAD_TOP + 3, VIEW_W, 1);
 
     const laneOffset = -((distance * 1.04) % 170);
-    ctx.fillStyle = level.map === "downtown" ? "rgba(213, 94, 233, .28)" : "rgba(237, 212, 152, .3)";
+    ctx.fillStyle = ["downtown", "tunnel", "crown"].includes(level.scene) ? `${level.accent}54` : "rgba(237, 212, 152, .3)";
     for (let x = laneOffset - 170; x < VIEW_W + 170; x += 170) {
       ctx.save();
       ctx.transform(1, 0, -.2, 1, 0, 0);
@@ -1465,7 +1767,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ctx.fill();
 
     const body = ctx.createLinearGradient(x, y, x, y + obstacle.height);
-    body.addColorStop(0, level.map === "golden" ? "#765523" : "#5f286a");
+    body.addColorStop(0, ["coast", "crown", "finale"].includes(level.scene) ? "#765523" : "#5f286a");
     body.addColorStop(.48, "#201124");
     body.addColorStop(1, "#08080a");
     ctx.fillStyle = body;
@@ -1519,6 +1821,125 @@ document.addEventListener("DOMContentLoaded", () => {
     ctx.restore();
   }
 
+  function drawHydrant(obstacle) {
+    const x = obstacle.x;
+    const y = GROUND_Y - obstacle.height + 3;
+    ctx.save();
+    ctx.fillStyle = "#9c342b";
+    pathRoundRect(ctx, x + 9, y + 12, obstacle.width - 18, obstacle.height - 12, 5);
+    ctx.fill();
+    ctx.fillStyle = "#d8a44d";
+    ctx.fillRect(x + 5, y + 17, obstacle.width - 10, 8);
+    ctx.beginPath();
+    ctx.arc(x + obstacle.width / 2, y + 11, 12, Math.PI, 0);
+    ctx.fill();
+    ctx.fillStyle = "#6f201c";
+    ctx.fillRect(x + 2, y + obstacle.height - 7, obstacle.width - 4, 7);
+    ctx.restore();
+  }
+
+  function drawCrate(obstacle) {
+    const x = obstacle.x;
+    const y = GROUND_Y - obstacle.height + 3;
+    ctx.save();
+    const wood = ctx.createLinearGradient(x, y, x + obstacle.width, y + obstacle.height);
+    wood.addColorStop(0, "#9b6635");
+    wood.addColorStop(1, "#4f2d18");
+    ctx.fillStyle = wood;
+    ctx.fillRect(x, y, obstacle.width, obstacle.height);
+    ctx.strokeStyle = "#d39a58";
+    ctx.lineWidth = 4;
+    ctx.strokeRect(x + 2, y + 2, obstacle.width - 4, obstacle.height - 4);
+    ctx.beginPath();
+    ctx.moveTo(x + 7, y + 7);
+    ctx.lineTo(x + obstacle.width - 7, y + obstacle.height - 7);
+    ctx.moveTo(x + obstacle.width - 7, y + 7);
+    ctx.lineTo(x + 7, y + obstacle.height - 7);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawRoadblock(obstacle) {
+    const x = obstacle.x;
+    const y = GROUND_Y - obstacle.height + 3;
+    ctx.save();
+    ctx.fillStyle = "#d9d8d0";
+    pathRoundRect(ctx, x, y + 13, obstacle.width, 27, 4);
+    ctx.fill();
+    ctx.fillStyle = "#b85437";
+    for (let stripe = 7; stripe < obstacle.width; stripe += 25) ctx.fillRect(x + stripe, y + 13, 11, 27);
+    ctx.fillStyle = "#686d6d";
+    ctx.fillRect(x + 12, y + 40, 7, 18);
+    ctx.fillRect(x + obstacle.width - 19, y + 40, 7, 18);
+    [x + 14, x + obstacle.width - 14].forEach((lampX) => {
+      ctx.shadowColor = "#f4d58b";
+      ctx.shadowBlur = 12;
+      ctx.fillStyle = "#f4d58b";
+      ctx.beginPath();
+      ctx.arc(lampX, y + 7, 5, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    ctx.restore();
+  }
+
+  function drawPolice(obstacle) {
+    drawTraffic(obstacle);
+    const x = obstacle.x;
+    const y = GROUND_Y - obstacle.height + 3;
+    ctx.save();
+    const flash = Math.floor(elapsed * 10) % 2 === 0;
+    ctx.shadowBlur = 16;
+    ctx.shadowColor = flash ? "#5aa9ff" : "#ff4f62";
+    ctx.fillStyle = flash ? "#5aa9ff" : "#ff4f62";
+    ctx.fillRect(x + 57, y - 3, 16, 5);
+    ctx.fillStyle = "rgba(244, 245, 241, .92)";
+    ctx.font = "700 8px Space Grotesk, sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("DRPD", x + 64, y + 31);
+    ctx.restore();
+  }
+
+  function drawGap(obstacle) {
+    drawPothole(obstacle);
+    const level = getLevelConfig();
+    const x = obstacle.x;
+    ctx.save();
+    ctx.strokeStyle = `${level.accent}8f`;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(x + 5, GROUND_Y - 5);
+    ctx.lineTo(x + 24, GROUND_Y - 15);
+    ctx.lineTo(x + 43, GROUND_Y - 4);
+    ctx.moveTo(x + obstacle.width - 5, GROUND_Y - 5);
+    ctx.lineTo(x + obstacle.width - 25, GROUND_Y - 14);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawGate(obstacle) {
+    const level = getLevelConfig();
+    const x = obstacle.x;
+    const y = GROUND_Y - obstacle.height + 3;
+    ctx.save();
+    ctx.shadowColor = level.accent;
+    ctx.shadowBlur = 18;
+    ctx.strokeStyle = level.accent;
+    ctx.lineWidth = 4;
+    ctx.strokeRect(x + 4, y + 3, obstacle.width - 8, obstacle.height - 7);
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = "rgba(4, 5, 7, .86)";
+    ctx.fillRect(x + 8, y + 7, obstacle.width - 16, obstacle.height - 15);
+    ctx.fillStyle = level.accent;
+    for (let stripe = 0; stripe < 4; stripe += 1) {
+      ctx.fillRect(x + 13, y + 14 + stripe * 13, obstacle.width - 26, 3);
+    }
+    ctx.fillStyle = "#f3f0e9";
+    ctx.font = "700 8px Space Grotesk, sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("DR", x + obstacle.width / 2, y + obstacle.height - 9);
+    ctx.restore();
+  }
+
   function drawObstacles() {
     obstacles.forEach((obstacle) => {
       if (obstacle.kind === "cone") drawCone(obstacle);
@@ -1526,6 +1947,12 @@ document.addEventListener("DOMContentLoaded", () => {
       if (obstacle.kind === "pothole") drawPothole(obstacle);
       if (obstacle.kind === "drum") drawDrum(obstacle);
       if (obstacle.kind === "traffic") drawTraffic(obstacle);
+      if (obstacle.kind === "hydrant") drawHydrant(obstacle);
+      if (obstacle.kind === "crate") drawCrate(obstacle);
+      if (obstacle.kind === "roadblock") drawRoadblock(obstacle);
+      if (obstacle.kind === "police") drawPolice(obstacle);
+      if (obstacle.kind === "gap") drawGap(obstacle);
+      if (obstacle.kind === "gate") drawGate(obstacle);
     });
   }
 
@@ -1814,6 +2241,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (hydraulicButton) hydraulicButton.addEventListener("pointerdown", handlePrimaryAction);
   canvas.addEventListener("pointerdown", handlePrimaryAction);
   if (pauseButton) pauseButton.addEventListener("click", togglePause);
+  if (gameFullscreenButton) gameFullscreenButton.addEventListener("click", () => void toggleGameFullscreen());
   if (scoreEntry) scoreEntry.addEventListener("submit", submitWorldwideScore);
   if (leaderboardRefresh) leaderboardRefresh.addEventListener("click", () => void loadLeaderboard());
   if (copyPromoButton) copyPromoButton.addEventListener("click", () => void copyPromoCode());
@@ -1827,7 +2255,13 @@ document.addEventListener("DOMContentLoaded", () => {
       event.preventDefault();
       togglePause();
     }
+    if (event.code === "Escape" && gameCabinet?.classList.contains("is-pseudo-fullscreen")) {
+      closePseudoGameFullscreen();
+    }
   });
+
+  document.addEventListener("fullscreenchange", updateGameFullscreenButton);
+  document.addEventListener("webkitfullscreenchange", updateGameFullscreenButton);
 
   document.addEventListener("visibilitychange", () => {
     if (document.hidden && mode === "running") togglePause();
@@ -1837,6 +2271,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
   resetScoreEntry();
   resetPromoReward();
+  if (holderLoadout) {
+    holderLoadout.textContent = holderMinimum >= 1000
+      ? "Crown holder build + badge active"
+      : holderMinimum >= 500
+        ? "Neon holder map + gold build active"
+        : holderMinimum >= 100
+          ? "Gold holder lowrider active"
+          : "Street build active";
+  }
   updateHud();
   resizeCanvas();
   void loadLeaderboard(false);

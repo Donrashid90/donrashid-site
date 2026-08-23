@@ -30,7 +30,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../style.css?v=7" />
-  <link rel="stylesheet" href="game.css?v=4" />
+  <link rel="stylesheet" href="game.css?v=6" />
 </head>
 <body class="game-page">
   <a class="skip-link" href="#game-main">Skip to game</a>
@@ -51,7 +51,7 @@
       <a href="/#music">Music</a>
       <a href="/#merch">Merch</a>
       <a class="nav-current" href="/game/" aria-current="page">Game</a>
-      <a href="/arcade/?v=6">Arcade</a>
+      <a href="/arcade/?v=8">Arcade</a>
       <a href="/#artist">Artist</a>
       <a href="https://youtube.com/@donrashidofficial" target="_blank" rel="noopener noreferrer">YouTube <span class="arrow" aria-hidden="true">&#8599;&#65038;</span></a>
       <a class="nav-stream" href="https://open.spotify.com/artist/0HbtnpVZONVd7S09jqmRZZ" target="_blank" rel="noopener noreferrer">Stream <span class="arrow" aria-hidden="true">&#8599;&#65038;</span></a>
@@ -69,19 +69,26 @@
             <h1 id="game-title">LOWRIDER<br /><em>NIGHT RUN</em></h1>
           </div>
           <div class="game-intro-copy">
-            <p>Five districts. Five upgraded lowriders. Clear every map and earn your place on the boulevard.</p>
+            <p>Twenty districts. Twenty upgraded lowriders. Claim the Level 5 reward, then conquer the full boulevard campaign.</p>
             <div class="game-specs" aria-label="Game details">
               <span>One-touch control</span>
-              <span>Five-level campaign</span>
+              <span>20-level campaign</span>
               <span>Worldwide top 10</span>
+              <span id="holderLoadout">Street build active</span>
             </div>
           </div>
         </div>
 
         <div class="arcade-cabinet" data-reveal>
-          <div class="cabinet-topline" aria-hidden="true">
-            <span>DR / GAME 001</span>
-            <span>3072 NIGHT DRIVE UNIT</span>
+          <div class="cabinet-topline">
+            <span aria-hidden="true">DR / GAME 001</span>
+            <div class="cabinet-actions">
+              <span aria-hidden="true">3072 NIGHT DRIVE UNIT</span>
+              <button class="fullscreen-button" id="gameFullscreenButton" type="button" aria-pressed="false">
+                <span class="fullscreen-icon" aria-hidden="true">⛶</span>
+                <span id="gameFullscreenLabel">Fullscreen</span>
+              </button>
+            </div>
           </div>
 
           <div class="game-hud" aria-label="Scoreboard">
@@ -99,7 +106,7 @@
           </div>
 
           <div class="level-strip" aria-label="Level progress">
-            <span class="level-number" id="levelValue">Level 1 / 5</span>
+            <span class="level-number" id="levelValue">Level 1 / 20</span>
             <span class="level-track" aria-hidden="true"><i id="levelProgress"></i></span>
             <span class="level-map" id="levelMap">Midnight Boulevard</span>
           </div>
@@ -111,7 +118,7 @@
 
             <div class="game-overlay is-visible" id="gameOverlay">
               <div class="overlay-mark" aria-hidden="true">DR</div>
-              <p class="overlay-kicker" id="overlayKicker">Level 1 / 5</p>
+              <p class="overlay-kicker" id="overlayKicker">Level 1 / 20</p>
               <h2 id="overlayTitle">MIDNIGHT<br /><em>BOULEVARD</em></h2>
               <p id="overlayText">Clear the first district and unlock your first chrome upgrade.</p>
               <button class="game-start" id="startButton" type="button">Start Level 1 <span aria-hidden="true">→</span></button>
@@ -213,6 +220,6 @@
   </footer>
 
   <script src="../script.js?v=2"></script>
-  <script src="game.js?v=5"></script>
+  <script src="game.js?v=7"></script>
 </body>
 </html>
