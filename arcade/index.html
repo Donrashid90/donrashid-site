@@ -30,7 +30,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../style.css?v=7" />
-  <link rel="stylesheet" href="arcade.css?v=2" />
+  <link rel="stylesheet" href="arcade.css?v=3" />
 </head>
 <body class="arcade-page">
   <a class="skip-link" href="#arcade-main">Skip to arcade</a>
@@ -51,7 +51,7 @@
       <a href="/#music">Music</a>
       <a href="/#merch">Merch</a>
       <a href="/game/">Game</a>
-      <a class="nav-current" href="/arcade/" aria-current="page">Arcade</a>
+      <a class="nav-current" href="/arcade/?v=3" aria-current="page">Arcade</a>
       <a href="/#artist">Artist</a>
       <a href="https://youtube.com/@donrashidofficial" target="_blank" rel="noopener noreferrer">YouTube <span class="arrow" aria-hidden="true">&#8599;&#65038;</span></a>
       <a class="nav-stream" href="https://open.spotify.com/artist/0HbtnpVZONVd7S09jqmRZZ" target="_blank" rel="noopener noreferrer">Stream <span class="arrow" aria-hidden="true">&#8599;&#65038;</span></a>
@@ -207,14 +207,14 @@
             <div class="machine-copy">
               <p class="machine-number">02 / MIDNIGHT ROULETTE</p>
               <h3 id="roulette-title">PLACE YOUR<br /><em>NIGHT BET.</em></h3>
-              <p>Pick one number from 0–36 or choose gold or black. The ball visibly lands in the winning pocket.</p>
+              <p>Select one or more numbers from 0–36 and optionally add gold or black. Every active bet costs 30 free DR Credits.</p>
               <div class="choice-row roulette-colors" role="group" aria-label="Choose roulette color">
-                <button class="choice-button is-selected" type="button" data-roulette-color="gold" aria-pressed="true">Gold ×2</button>
+                <button class="choice-button" type="button" data-roulette-color="gold" aria-pressed="false">Gold ×2</button>
                 <button class="choice-button" type="button" data-roulette-color="black" aria-pressed="false">Black ×2</button>
               </div>
               <div class="roulette-number-grid" id="rouletteNumberGrid" role="group" aria-label="Choose a roulette number"></div>
-              <div class="roulette-bet-status">Current bet <strong id="rouletteBetLabel">Gold ×2</strong></div>
-              <div class="machine-result" id="rouletteResult" aria-live="polite">Gold selected. Pick a number for ×36.</div>
+              <div class="roulette-bet-status"><span>Current bet</span><strong id="rouletteBetLabel">No bets selected</strong><button id="rouletteClearButton" type="button">Clear</button></div>
+              <div class="machine-result" id="rouletteResult" aria-live="polite">Choose one or more numbers and/or a color.</div>
             </div>
             <div class="roulette-machine">
               <div class="roulette-stage" aria-label="European roulette wheel">
@@ -225,7 +225,7 @@
                 </div>
                 <div class="roulette-pointer" aria-hidden="true"></div>
               </div>
-              <button class="machine-action" id="rouletteButton" type="button">Roll 30 <span aria-hidden="true">→</span></button>
+              <button class="machine-action" id="rouletteButton" type="button"><span>Roll <strong id="rouletteCostLabel">—</strong></span><span aria-hidden="true">→</span></button>
             </div>
           </section>
 
@@ -281,6 +281,6 @@
 
   <script src="../script.js?v=2"></script>
   <script src="config.js?v=2"></script>
-  <script type="module" src="arcade.js?v=2"></script>
+  <script type="module" src="arcade.js?v=3"></script>
 </body>
 </html>
