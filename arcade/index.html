@@ -30,7 +30,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../style.css?v=7" />
-  <link rel="stylesheet" href="arcade.css?v=1" />
+  <link rel="stylesheet" href="arcade.css?v=2" />
 </head>
 <body class="arcade-page">
   <a class="skip-link" href="#arcade-main">Skip to arcade</a>
@@ -166,7 +166,7 @@
 
         <nav class="machine-tabs" aria-label="Arcade machines" data-reveal>
           <button class="machine-tab is-active" type="button" data-machine="slots" aria-pressed="true">
-            <span>01</span><strong>Lowrider Slots</strong><small>20 credits</small>
+            <span>01</span><strong>Lowrider Slots</strong><small>40 credits</small>
           </button>
           <button class="machine-tab" type="button" data-machine="roulette" aria-pressed="false">
             <span>02</span><strong>Midnight Roulette</strong><small>30 credits</small>
@@ -188,34 +188,42 @@
           <section class="machine-panel is-active" id="slotsPanel" data-panel="slots" aria-labelledby="slots-title">
             <div class="machine-copy">
               <p class="machine-number">01 / LOWRIDER SLOTS</p>
-              <h3 id="slots-title">SPIN THE<br /><em>BOULEVARD.</em></h3>
-              <p>Match chrome, palms and lowriders. Wins return only free DR Credits.</p>
+              <h3 id="slots-title">FIVE REELS.<br /><em>ONE BOULEVARD.</em></h3>
+              <p>Five reels, three rows and five active lines. DR is wild. Every win returns only free DR Credits.</p>
               <div class="machine-result" id="slotsResult" aria-live="polite">Ready for the first spin.</div>
             </div>
             <div class="slots-machine">
-              <div class="slot-reels" id="slotReels" aria-label="Slot results">
-                <div class="slot-reel"><span data-reel="0">DR</span><small>DR Coin</small></div>
-                <div class="slot-reel"><span data-reel="1">◉</span><small>Chrome wheel</small></div>
-                <div class="slot-reel"><span data-reel="2">◆</span><small>Lowrider</small></div>
+              <div class="slot-cabinet">
+                <div class="slot-marquee"><span>DR</span><strong>BOULEVARD GOLD</strong><small>5 LINES</small></div>
+                <div class="slot-reels" id="slotReels" aria-label="Five-reel slot results"></div>
+                <div class="slot-lines" aria-label="Active pay lines"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+                <div class="slot-paytable"><span>DR = WILD</span><span>3+ FROM LEFT WINS</span><span>FREE PLAY</span></div>
               </div>
-              <button class="machine-action" id="spinButton" type="button">Spin 20 <span aria-hidden="true">→</span></button>
+              <button class="machine-action" id="spinButton" type="button">Spin 40 <span aria-hidden="true">→</span></button>
             </div>
           </section>
 
           <section class="machine-panel" id="roulettePanel" data-panel="roulette" aria-labelledby="roulette-title" hidden>
             <div class="machine-copy">
               <p class="machine-number">02 / MIDNIGHT ROULETTE</p>
-              <h3 id="roulette-title">PICK YOUR<br /><em>COLOR.</em></h3>
-              <p>Choose gold or black. This wheel uses free credits and has no cash value.</p>
-              <div class="choice-row" role="group" aria-label="Choose roulette color">
-                <button class="choice-button is-selected" type="button" data-roulette-choice="gold" aria-pressed="true">Gold</button>
-                <button class="choice-button" type="button" data-roulette-choice="black" aria-pressed="false">Black</button>
+              <h3 id="roulette-title">PLACE YOUR<br /><em>NIGHT BET.</em></h3>
+              <p>Pick one number from 0–36 or choose gold or black. The ball visibly lands in the winning pocket.</p>
+              <div class="choice-row roulette-colors" role="group" aria-label="Choose roulette color">
+                <button class="choice-button is-selected" type="button" data-roulette-color="gold" aria-pressed="true">Gold ×2</button>
+                <button class="choice-button" type="button" data-roulette-color="black" aria-pressed="false">Black ×2</button>
               </div>
-              <div class="machine-result" id="rouletteResult" aria-live="polite">Gold selected.</div>
+              <div class="roulette-number-grid" id="rouletteNumberGrid" role="group" aria-label="Choose a roulette number"></div>
+              <div class="roulette-bet-status">Current bet <strong id="rouletteBetLabel">Gold ×2</strong></div>
+              <div class="machine-result" id="rouletteResult" aria-live="polite">Gold selected. Pick a number for ×36.</div>
             </div>
             <div class="roulette-machine">
-              <div class="roulette-wheel" id="rouletteWheel" aria-hidden="true">
-                <div class="roulette-center">DR</div>
+              <div class="roulette-stage" aria-label="European roulette wheel">
+                <div class="roulette-ball-track" id="rouletteBall" aria-hidden="true"><i></i></div>
+                <div class="roulette-wheel" id="rouletteWheel" aria-hidden="true">
+                  <div class="roulette-pockets" id="roulettePockets"></div>
+                  <div class="roulette-center"><span>DR</span><small>MIDNIGHT</small></div>
+                </div>
+                <div class="roulette-pointer" aria-hidden="true"></div>
               </div>
               <button class="machine-action" id="rouletteButton" type="button">Roll 30 <span aria-hidden="true">→</span></button>
             </div>
@@ -273,6 +281,6 @@
 
   <script src="../script.js?v=2"></script>
   <script src="config.js?v=2"></script>
-  <script type="module" src="arcade.js?v=1"></script>
+  <script type="module" src="arcade.js?v=2"></script>
 </body>
 </html>
