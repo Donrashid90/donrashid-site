@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const walletMessage = document.getElementById("walletMessage");
   const tierCards = [...document.querySelectorAll("[data-tier-minimum]")];
 
-  const creditBalance = document.getElementById("creditBalance");
+  const creditBalances = [...document.querySelectorAll("[data-credit-balance]")];
   const creditGrantStatus = document.getElementById("creditGrantStatus");
   const arcadeStatus = document.getElementById("arcadeStatus");
   const resetCreditsButton = document.getElementById("resetCreditsButton");
@@ -106,7 +106,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function updateCredits(message = "") {
-    if (creditBalance) creditBalance.textContent = formatNumber(creditsState.credits);
+    creditBalances.forEach((balance) => {
+      balance.textContent = formatNumber(creditsState.credits);
+    });
     if (arcadeStatus && message) arcadeStatus.textContent = message;
 
     if (spinButton) spinButton.disabled = machineBusy || creditsState.credits < GAME_COSTS.slots;
