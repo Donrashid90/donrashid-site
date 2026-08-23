@@ -8,13 +8,14 @@ import {
   flipResult,
   holderTier,
   isEthereumAddress,
+  rouletteBetCost,
   rouletteColor,
   rouletteResult,
   secureRandomIndex,
   shortenAddress,
   slotPayoutDetails,
   wholeTokenBalance
-} from "./core.js?v=2";
+} from "./core.js?v=3";
 
 document.addEventListener("DOMContentLoaded", () => {
   const config = window.DR_ARCADE_CONFIG || {};
@@ -49,6 +50,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const roulettePockets = document.getElementById("roulettePockets");
   const rouletteNumberGrid = document.getElementById("rouletteNumberGrid");
   const rouletteBetLabel = document.getElementById("rouletteBetLabel");
+  const rouletteCostLabel = document.getElementById("rouletteCostLabel");
+  const rouletteClearButton = document.getElementById("rouletteClearButton");
   const rouletteButton = document.getElementById("rouletteButton");
   const rouletteResultLabel = document.getElementById("rouletteResult");
   const rouletteColorButtons = [...document.querySelectorAll("[data-roulette-color]")];
@@ -68,7 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let walletVerified = false;
   let wholeBalance = 0n;
   let machineBusy = false;
-  let rouletteBet = { type: "color", value: "gold" };
+  let rouletteBets = [];
   let flipChoice = "dr";
   let rouletteRotation = 0;
   let rouletteBallRotation = 0;
@@ -107,7 +110,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (arcadeStatus && message) arcadeStatus.textContent = message;
 
     if (spinButton) spinButton.disabled = machineBusy || creditsState.credits < GAME_COSTS.slots;
-    if (rouletteButton) rouletteButton.disabled = machineBusy || creditsState.credits < GAME_COSTS.roulette;
+    const activeRouletteCost = rouletteBetCost(rouletteBets);
+    if (rouletteCostLabel) rouletteCostLabel.textContent = activeRouletteCost ? formatNumber(activeRouletteCost) : "—";
+    if (rouletteButton) rouletteButton.disabled = machineBusy || activeRouletteCost === 0 || creditsState.credits < activeRouletteCost;
     if (flipButton) flipButton.disabled = machineBusy || creditsState.credits < GAME_COSTS.flip;
   }
 
@@ -289,25 +294,50 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function updateRouletteSelection() {
+    const hasBet = (type, value) => rouletteBets.some((bet) => bet.type === type && bet.value === value);
+
     rouletteColorButtons.forEach((button) => {
-      const selected = rouletteBet.type === "color" && button.dataset.rouletteColor === rouletteBet.value;
+      const selected = hasBet("color", button.dataset.rouletteColor);
       button.classList.toggle("is-selected", selected);
       button.setAttribute("aria-pressed", String(selected));
     });
 
     rouletteNumberGrid?.querySelectorAll("[data-roulette-number]").forEach((button) => {
-      const selected = rouletteBet.type === "number" && Number(button.dataset.rouletteNumber) === rouletteBet.value;
+      const selected = hasBet("number", Number(button.dataset.rouletteNumber));
       button.classList.toggle("is-selected", selected);
       button.setAttribute("aria-pressed", String(selected));
     });
 
-    const label = rouletteBet.type === "number" ? `Number ${rouletteBet.value} ×36` : `${rouletteBet.value === "gold" ? "Gold" : "Black"} ×2`;
+    const numberCount = rouletteBets.filter((bet) => bet.type === "number").length;
+    const colors = rouletteBets
+      .filter((bet) => bet.type === "color")
+      .map((bet) => bet.value === "gold" ? "Gold" : "Black");
+    const parts = [];
+    if (numberCount) parts.push(`${numberCount} number${numberCount === 1 ? "" : "s"}`);
+    if (colors.length) parts.push(colors.join(" + "));
+    const cost = rouletteBetCost(rouletteBets);
+    const label = rouletteBets.length ? `${parts.join(" + ")} · ${formatNumber(cost)} credits` : "No bets selected";
     if (rouletteBetLabel) rouletteBetLabel.textContent = label;
-    setResult(rouletteResultLabel, `${label} selected.`);
+    setResult(rouletteResultLabel, rouletteBets.length ? `${rouletteBets.length} active bet${rouletteBets.length === 1 ? "" : "s"}. Tap again to remove.` : "Choose one or more numbers and/or a color.");
+    updateCredits();
+  }
+
+  function toggleRouletteBet(type, value) {
+    if (machineBusy) return;
+    const index = rouletteBets.findIndex((bet) => bet.type === type && bet.value === value);
+    if (index >= 0) rouletteBets.splice(index, 1);
+    else rouletteBets.push({ type, value });
+    updateRouletteSelection();
   }
 
   async function rollRoulette() {
-    if (!spendCredits(GAME_COSTS.roulette) || !rouletteWheel || !rouletteBall) return;
+    const activeBets = rouletteBets.map((bet) => ({ ...bet }));
+    const totalStake = rouletteBetCost(activeBets);
+    if (!activeBets.length) {
+      setResult(rouletteResultLabel, "Choose at least one number or color first.");
+      return;
+    }
+    if (!spendCredits(totalStake) || !rouletteWheel || !rouletteBall) return;
     setMachineBusy(true);
     setResult(rouletteResultLabel, "The ball is running around Midnight Boulevard…");
 
@@ -325,11 +355,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     await wait(2450);
     rouletteBall.classList.remove("is-rolling");
-    const payout = rouletteResult(rouletteBet, outcome);
+    const payout = rouletteResult(activeBets, outcome);
+    const winningBets = activeBets.filter((bet) => rouletteResult(bet, outcome) > 0);
     const color = rouletteColor(outcome);
     if (payout > 0) {
       awardCredits(payout, `Midnight Roulette returned ${payout} free DR Credits.`);
-      setResult(rouletteResultLabel, `${outcome} / ${color.toUpperCase()} — HIT. +${payout} DR Credits`, true);
+      setResult(rouletteResultLabel, `${outcome} / ${color.toUpperCase()} — ${winningBets.length} BET${winningBets.length === 1 ? "" : "S"} HIT. +${payout} DR Credits`, true);
     } else {
       updateCredits("The ball missed your bet. No real value was lost.");
       setResult(rouletteResultLabel, `${outcome} / ${color.toUpperCase()} — The next roll is yours.`);
@@ -561,14 +592,18 @@ document.addEventListener("DOMContentLoaded", () => {
   if (flipButton) flipButton.addEventListener("click", () => void flipChromeCoin());
 
   rouletteColorButtons.forEach((button) => button.addEventListener("click", () => {
-    rouletteBet = { type: "color", value: button.dataset.rouletteColor };
-    updateRouletteSelection();
+    toggleRouletteBet("color", button.dataset.rouletteColor);
   }));
 
   rouletteNumberGrid?.addEventListener("click", (event) => {
     const button = event.target.closest("[data-roulette-number]");
     if (!button || machineBusy) return;
-    rouletteBet = { type: "number", value: Number(button.dataset.rouletteNumber) };
+    toggleRouletteBet("number", Number(button.dataset.rouletteNumber));
+  });
+
+  if (rouletteClearButton) rouletteClearButton.addEventListener("click", () => {
+    if (machineBusy) return;
+    rouletteBets = [];
     updateRouletteSelection();
   });
 
