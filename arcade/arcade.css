@@ -879,6 +879,7 @@
 
 .roulette-bet-status {
   display: flex;
+  align-items: center;
   justify-content: space-between;
   gap: 15px;
   margin-top: 11px;
@@ -889,7 +890,23 @@
   text-transform: uppercase;
 }
 
-.roulette-bet-status strong { color: var(--gold-light); }
+.roulette-bet-status strong {
+  flex: 1;
+  color: var(--gold-light);
+  text-align: right;
+}
+
+.roulette-bet-status button {
+  border: 0;
+  border-left: 1px solid rgba(243, 240, 233, .14);
+  background: transparent;
+  color: rgba(243, 240, 233, .62);
+  padding: 3px 0 3px 12px;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  cursor: pointer;
+}
 
 .roulette-stage {
   position: relative;
@@ -950,14 +967,19 @@
   left: 50%;
   width: 18px;
   height: 50%;
-  padding-top: 4px;
+  box-sizing: border-box;
+  padding-top: clamp(26px, 9vw, 42px);
   color: rgba(255, 248, 221, .92);
-  font-size: 6px;
+  font-size: 7px;
   font-weight: 800;
+  line-height: 1;
   text-align: center;
+  text-shadow: 0 1px 2px #000;
   transform: translate(-50%, -100%) rotate(var(--pocket-angle));
   transform-origin: 50% 100%;
 }
+
+.machine-action strong { font: inherit; }
 
 .roulette-ball-track {
   position: absolute;
