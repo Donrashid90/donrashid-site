@@ -13,9 +13,9 @@ const files = Object.fromEntries(await Promise.all([
 
 test("adds Arcade navigation without removing the existing Game route", () => {
   assert.match(files["index.html"], /href="\/game\/">Game<\/a>/);
-  assert.match(files["index.html"], /href="\/arcade\/\?v=4">Arcade<\/a>/);
+  assert.match(files["index.html"], /href="\/arcade\/\?v=5">Arcade<\/a>/);
   assert.match(files["game/index.html"], /class="nav-current" href="\/game\/"/);
-  assert.match(files["game/index.html"], /href="\/arcade\/\?v=4">Arcade<\/a>/);
+  assert.match(files["game/index.html"], /href="\/arcade\/\?v=5">Arcade<\/a>/);
 });
 
 test("preserves the existing five-level game, leaderboard and reward integration", () => {
@@ -38,6 +38,7 @@ test("upgrades the Arcade with five-reel slots and numbered roulette", () => {
   assert.match(files["arcade/index.html"], /id="rouletteBall"/);
   assert.match(files["arcade/index.html"], /id="rouletteClearButton"/);
   assert.match(files["arcade/arcade.js"], /toggleRouletteBet/);
+  assert.match(files["arcade/arcade.js"], /\(index \+ 0\.5\) \* step/);
   assert.match(files["arcade/arcade.js"], /ROULETTE_ORDER/);
   assert.match(files["arcade/arcade.js"], /Array\.from\(\{ length: 5 \}/);
 });
