@@ -9,6 +9,7 @@ import {
   holderTier,
   isEthereumAddress,
   rouletteColor,
+  rouletteBetCost,
   rouletteResult,
   secureRandomIndex,
   shortenAddress,
@@ -70,6 +71,15 @@ test("calculates free-play machine results", () => {
   assert.equal(rouletteResult({ type: "color", value: "gold" }, 2), 0);
   assert.equal(rouletteResult({ type: "number", value: 17 }, 17), 1080);
   assert.equal(rouletteResult({ type: "number", value: 17 }, 18), 0);
+  const multiBets = [
+    { type: "number", value: 17 },
+    { type: "number", value: 18 },
+    { type: "color", value: "gold" }
+  ];
+  assert.equal(rouletteBetCost(multiBets), 90);
+  assert.equal(rouletteResult(multiBets, 17), 1080);
+  assert.equal(rouletteResult(multiBets, 18), 1140);
+  assert.equal(rouletteResult([], 18), 0);
   assert.equal(flipResult("dr", "dr"), 20);
   assert.equal(flipResult("chrome", "dr"), 0);
 });
