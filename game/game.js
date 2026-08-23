@@ -13,6 +13,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const gameFullscreenLabel = document.getElementById("gameFullscreenLabel");
   const scoreValue = document.getElementById("scoreValue");
   const bestValue = document.getElementById("bestValue");
+  const motorHud = document.getElementById("motorHud");
+  const motorValue = document.getElementById("motorValue");
+  const motorUnits = [...document.querySelectorAll("[data-motor-unit]")];
   const levelValue = document.getElementById("levelValue");
   const levelMap = document.getElementById("levelMap");
   const levelProgress = document.getElementById("levelProgress");
@@ -49,6 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const DEVICE_KEY = "don-rashid-lowrider-night-run-device-v1";
   const HOLDER_ACCESS_KEY = "don-rashid-holder-access-v1";
   const REWARD_LEVEL = 5;
+  const MAX_MOTORS = 3;
   const LEADERBOARD_API = leaderboardRoot?.dataset.apiUrl || "";
 
   const DISTRICTS = [
@@ -135,6 +139,8 @@ document.addEventListener("DOMContentLoaded", () => {
   let distance = 0;
   let score = 0;
   let speed = 285;
+  let motors = MAX_MOTORS;
+  let hitProtection = 0;
   let obstacleClock = 1.2;
   let pickupClock = 2.1;
   let announcementTimer = 0;
@@ -548,6 +554,11 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateHud() {
     if (scoreValue) scoreValue.textContent = formatScore(score);
     if (bestValue) bestValue.textContent = formatScore(best);
+    if (motorValue) motorValue.textContent = `${motors} / ${MAX_MOTORS}`;
+    if (motorHud) motorHud.setAttribute("aria-label", `${motors} of ${MAX_MOTORS} motors remaining`);
+    motorUnits.forEach((unit, index) => {
+      unit.classList.toggle("is-lost", index >= motors);
+    });
     const level = getLevelConfig();
     if (levelValue) levelValue.textContent = `Level ${currentLevel} / ${FINAL_LEVEL}`;
     if (levelMap) levelMap.textContent = level.name;
@@ -664,6 +675,7 @@ document.addEventListener("DOMContentLoaded", () => {
     lastTime = performance.now();
     levelElapsed = 0;
     speed = level.baseSpeed;
+    hitProtection = 0;
     obstacleClock = 1.05;
     pickupClock = 1.55;
     obstacles.length = 0;
@@ -691,6 +703,8 @@ document.addEventListener("DOMContentLoaded", () => {
     currentLevel = 1;
     distance = 0;
     score = 0;
+    motors = MAX_MOTORS;
+    hitProtection = 0;
     resetScoreEntry();
     resetPromoReward();
     levelCheckpointPromise = Promise.resolve(null);
@@ -793,6 +807,38 @@ document.addEventListener("DOMContentLoaded", () => {
       button: "Run it back"
     });
     void offerWorldwideScore(finalScore, finalDurationMs, currentLevel, finishedRunSequence);
+  }
+
+  function loseMotor() {
+    if (mode !== "running" || hitProtection > 0) return;
+
+    motors = Math.max(0, motors - 1);
+    updateHud();
+
+    if (motors === 0) {
+      endGame();
+      return;
+    }
+
+    const level = getLevelConfig();
+    obstacles.length = 0;
+    resetPlayer();
+    hitProtection = 1.6;
+    obstacleClock = Math.max(obstacleClock, 1.45);
+    if (runStatus) runStatus.textContent = `Motor lost — ${motors} remaining · Level ${currentLevel} continues`;
+    showAnnouncement(`MOTOR LOST · ${motors} LEFT · KEEP GOING`);
+
+    for (let spark = 0; spark < 22; spark += 1) {
+      particles.push({
+        x: player.x + 54 + Math.random() * 118,
+        y: GROUND_Y - 22 + Math.random() * 36,
+        vx: -140 + Math.random() * 230,
+        vy: -120 + Math.random() * 125,
+        life: .35 + Math.random() * .55,
+        maxLife: .9,
+        color: spark % 3 === 0 ? level.accent : "#edd498"
+      });
+    }
   }
 
   async function submitWorldwideScore(event) {
@@ -992,6 +1038,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function update(dt) {
     elapsed += dt;
     levelElapsed += dt;
+    hitProtection = Math.max(0, hitProtection - dt);
     const level = getLevelConfig();
     speed = Math.min(level.maxSpeed, level.baseSpeed + levelElapsed * level.acceleration);
     distance += speed * dt;
@@ -1068,7 +1115,7 @@ document.addEventListener("DOMContentLoaded", () => {
         : overlaps(car, hitbox);
 
       if (hasHit) {
-        endGame();
+        loseMotor();
         return;
       }
 
@@ -2072,6 +2119,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const compression = player.compression * 6;
 
     ctx.save();
+    if (hitProtection > 0 && Math.floor(hitProtection * 12) % 2 === 0) ctx.globalAlpha = .42;
     ctx.translate(baseX + 98, baseY + 52);
     ctx.rotate(player.tilt);
     ctx.translate(-(baseX + 98), -(baseY + 52));

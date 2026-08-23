@@ -30,7 +30,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../style.css?v=7" />
-  <link rel="stylesheet" href="game.css?v=6" />
+  <link rel="stylesheet" href="game.css?v=7" />
 </head>
 <body class="game-page">
   <a class="skip-link" href="#game-main">Skip to game</a>
@@ -72,6 +72,7 @@
             <p>Twenty districts. Twenty upgraded lowriders. Claim the Level 5 reward, then conquer the full boulevard campaign.</p>
             <div class="game-specs" aria-label="Game details">
               <span>One-touch control</span>
+              <span>3 motors per run</span>
               <span>20-level campaign</span>
               <span>Worldwide top 10</span>
               <span id="holderLoadout">Street build active</span>
@@ -96,8 +97,14 @@
               <span class="hud-label">Score</span>
               <strong id="scoreValue">000000</strong>
             </div>
-            <div class="hud-center">
-              <span class="hud-live"><i></i> Boulevard live</span>
+            <div class="hud-center motor-hud" id="motorHud" aria-label="3 of 3 motors remaining">
+              <span class="hud-label">Motors</span>
+              <span class="motor-units" aria-hidden="true">
+                <i class="motor-unit" data-motor-unit></i>
+                <i class="motor-unit" data-motor-unit></i>
+                <i class="motor-unit" data-motor-unit></i>
+              </span>
+              <small id="motorValue">3 / 3</small>
             </div>
             <div>
               <span class="hud-label">Best</span>
@@ -120,7 +127,7 @@
               <div class="overlay-mark" aria-hidden="true">DR</div>
               <p class="overlay-kicker" id="overlayKicker">Level 1 / 20</p>
               <h2 id="overlayTitle">MIDNIGHT<br /><em>BOULEVARD</em></h2>
-              <p id="overlayText">Clear the first district and unlock your first chrome upgrade.</p>
+              <p id="overlayText">Three motors protect your run. Clear the first district and unlock your first chrome upgrade.</p>
               <button class="game-start" id="startButton" type="button">Start Level 1 <span aria-hidden="true">→</span></button>
               <small class="overlay-control-hint">Tap anywhere or use Space / ↑</small>
 
@@ -193,8 +200,9 @@
           <ol>
             <li><span>01</span><p>Tap or press Space to fire the hydraulics.</p></li>
             <li><span>02</span><p>Clear cones, barriers and broken asphalt.</p></li>
-            <li><span>03</span><p>Every new level brings a new map, more speed and a stronger lowrider.</p></li>
-            <li><span>04</span><p>Complete Level 5 to unlock a limited one-time shop reward.</p></li>
+            <li><span>03</span><p>Every crash costs one motor. With motors left, the same level and score continue.</p></li>
+            <li><span>04</span><p>Every new level brings a new map, more speed and a stronger lowrider.</p></li>
+            <li><span>05</span><p>Complete Level 5 to unlock a limited one-time shop reward.</p></li>
           </ol>
           <div class="game-links">
             <a class="action action-primary" href="https://youtube.com/@donrashidofficial" target="_blank" rel="noopener noreferrer">Enter the sound <span class="arrow" aria-hidden="true">&#8599;&#65038;</span></a>
@@ -220,6 +228,6 @@
   </footer>
 
   <script src="../script.js?v=2"></script>
-  <script src="game.js?v=7"></script>
+  <script src="game.js?v=8"></script>
 </body>
 </html>
