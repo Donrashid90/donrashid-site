@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>DR Arcade — Don Rashid</title>
+  <meta name="description" content="Enter the free-play Don Rashid Arcade. Connect a wallet for DRC holder access, unlock custom lowriders and play with free DR Credits." />
+  <meta name="theme-color" content="#070708" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://donrashid.com/arcade/" />
+
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg?v=1" />
+  <link rel="shortcut icon" href="/assets/favicon.svg?v=1" />
+  <link rel="mask-icon" href="/assets/favicon.svg?v=1" color="#cba25b" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="DR Arcade — Don Rashid" />
+  <meta property="og:description" content="Free play. Holder access. No cash out." />
+  <meta property="og:url" content="https://donrashid.com/arcade/" />
+  <meta property="og:image" content="https://donrashid.com/assets/hero.jpg" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="DR Arcade — Don Rashid" />
+  <meta name="twitter:description" content="Free play. Holder access. No cash out." />
+  <meta name="twitter:image" content="https://donrashid.com/assets/hero.jpg" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css?v=7" />
+  <link rel="stylesheet" href="arcade.css?v=1" />
+</head>
+<body class="arcade-page">
+  <a class="skip-link" href="#arcade-main">Skip to arcade</a>
+  <div class="page-grain" aria-hidden="true"></div>
+
+  <header class="site-header scrolled" id="top">
+    <a class="brand" href="/" aria-label="Don Rashid home">
+      <span class="brand-mark" aria-hidden="true">DR</span>
+      <span class="brand-name">DON RASHID</span>
+    </a>
+
+    <button class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="site-nav">
+      <span></span>
+      <span></span>
+    </button>
+
+    <nav class="site-nav" id="site-nav" aria-label="Main navigation">
+      <a href="/#music">Music</a>
+      <a href="/#merch">Merch</a>
+      <a href="/game/">Game</a>
+      <a class="nav-current" href="/arcade/" aria-current="page">Arcade</a>
+      <a href="/#artist">Artist</a>
+      <a href="https://youtube.com/@donrashidofficial" target="_blank" rel="noopener noreferrer">YouTube <span class="arrow" aria-hidden="true">&#8599;&#65038;</span></a>
+      <a class="nav-stream" href="https://open.spotify.com/artist/0HbtnpVZONVd7S09jqmRZZ" target="_blank" rel="noopener noreferrer">Stream <span class="arrow" aria-hidden="true">&#8599;&#65038;</span></a>
+    </nav>
+  </header>
+
+  <main id="arcade-main">
+    <section class="arcade-hero" aria-labelledby="arcade-title">
+      <div class="arcade-grid-bg" aria-hidden="true"></div>
+      <img class="arcade-hero-art" src="../assets/analog-boulevard-drop-001.webp" width="881" height="900" alt="" aria-hidden="true" />
+      <div class="arcade-shell">
+        <div class="arcade-hero-grid">
+          <div class="arcade-intro" data-reveal>
+            <p class="section-index"><span>05</span> Holder universe</p>
+            <p class="arcade-kicker">Don Rashid presents</p>
+            <h1 id="arcade-title"><span>DR</span> ARCADE</h1>
+            <p class="arcade-lead">Connect your wallet, prove DRC ownership and unlock vehicles, maps and VIP machines. Every game runs on free DR Credits.</p>
+            <div class="arcade-principles" aria-label="Arcade safety details">
+              <span>Free play</span>
+              <span>No cash out</span>
+              <span>DRC never spent</span>
+            </div>
+          </div>
+
+          <aside class="wallet-console" id="walletPanel" data-reveal aria-labelledby="wallet-title">
+            <div class="wallet-console-head">
+              <div>
+                <span class="console-label">Base Sepolia / Testnet</span>
+                <h2 id="wallet-title">DRC HOLDER ACCESS</h2>
+              </div>
+              <div class="drc-coin" aria-hidden="true"><span>DR</span></div>
+            </div>
+
+            <div class="wallet-state">
+              <span class="wallet-dot" id="walletDot" aria-hidden="true"></span>
+              <div>
+                <small id="walletStateLabel">Wallet not connected</small>
+                <strong id="walletAddress">CONNECT TO VERIFY</strong>
+              </div>
+            </div>
+
+            <dl class="wallet-stats">
+              <div>
+                <dt>DRC balance</dt>
+                <dd id="drcBalance">—</dd>
+              </div>
+              <div>
+                <dt>Access tier</dt>
+                <dd id="holderTier">Street Access</dd>
+              </div>
+            </dl>
+
+            <button class="wallet-connect" id="connectWallet" type="button">
+              <span>Connect wallet</span><span aria-hidden="true">→</span>
+            </button>
+            <div class="wallet-secondary-actions">
+              <button id="addTokenButton" type="button" disabled>Add DRC to wallet</button>
+              <button id="clearWalletButton" type="button" hidden>Clear session</button>
+            </div>
+            <p class="wallet-message" id="walletMessage" aria-live="polite">Connection and signature only. No token approval or transfer.</p>
+          </aside>
+        </div>
+
+        <section class="unlock-section" aria-labelledby="unlock-title" data-reveal>
+          <div class="unlock-heading">
+            <div>
+              <p class="eyebrow">DRC holder utility</p>
+              <h2 id="unlock-title">HOLD.<br /><em>UNLOCK.</em></h2>
+            </div>
+            <p>Your DRC remains inside your wallet. The page performs a read-only balance check and unlocks cosmetic content.</p>
+          </div>
+
+          <div class="tier-grid" id="tierGrid">
+            <article class="tier-card is-active" data-tier-minimum="0">
+              <span>00 DRC</span>
+              <strong>Street Access</strong>
+              <p>Free DR Arcade</p>
+            </article>
+            <article class="tier-card" data-tier-minimum="100">
+              <span>100 DRC</span>
+              <strong>Chrome Access</strong>
+              <p>Gold lowrider skin</p>
+            </article>
+            <article class="tier-card" data-tier-minimum="500">
+              <span>500 DRC</span>
+              <strong>Neon Access</strong>
+              <p>Exclusive Neon Strip map</p>
+            </article>
+            <article class="tier-card" data-tier-minimum="1000">
+              <span>1,000 DRC</span>
+              <strong>Crown Access</strong>
+              <p>Crown machine theme and profile badge</p>
+            </article>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section class="arcade-floor" aria-labelledby="machines-title">
+      <div class="arcade-shell">
+        <div class="machine-heading" data-reveal>
+          <div>
+            <p class="section-index"><span>06</span> Free-play machines</p>
+            <h2 id="machines-title">CHOOSE YOUR<br /><em>NIGHT.</em></h2>
+          </div>
+          <div class="credit-balance" aria-label="DR Credits balance">
+            <span>Daily balance</span>
+            <strong><span id="creditBalance">1,000</span> DR CREDITS</strong>
+            <small id="creditGrantStatus">Free daily credits loaded</small>
+          </div>
+        </div>
+
+        <nav class="machine-tabs" aria-label="Arcade machines" data-reveal>
+          <button class="machine-tab is-active" type="button" data-machine="slots" aria-pressed="true">
+            <span>01</span><strong>Lowrider Slots</strong><small>20 credits</small>
+          </button>
+          <button class="machine-tab" type="button" data-machine="roulette" aria-pressed="false">
+            <span>02</span><strong>Midnight Roulette</strong><small>30 credits</small>
+          </button>
+          <button class="machine-tab" type="button" data-machine="flip" aria-pressed="false">
+            <span>03</span><strong>Chrome Flip</strong><small>10 credits</small>
+          </button>
+          <a class="machine-tab machine-link" href="/game/">
+            <span>04</span><strong>Night Run</strong><small>Five-level campaign ↗</small>
+          </a>
+        </nav>
+
+        <div class="machine-console" data-reveal>
+          <div class="machine-topline" aria-hidden="true">
+            <span>DR / ARCADE UNIT 001</span>
+            <span>FREE PLAY • NO CASH OUT</span>
+          </div>
+
+          <section class="machine-panel is-active" id="slotsPanel" data-panel="slots" aria-labelledby="slots-title">
+            <div class="machine-copy">
+              <p class="machine-number">01 / LOWRIDER SLOTS</p>
+              <h3 id="slots-title">SPIN THE<br /><em>BOULEVARD.</em></h3>
+              <p>Match chrome, palms and lowriders. Wins return only free DR Credits.</p>
+              <div class="machine-result" id="slotsResult" aria-live="polite">Ready for the first spin.</div>
+            </div>
+            <div class="slots-machine">
+              <div class="slot-reels" id="slotReels" aria-label="Slot results">
+                <div class="slot-reel"><span data-reel="0">DR</span><small>DR Coin</small></div>
+                <div class="slot-reel"><span data-reel="1">◉</span><small>Chrome wheel</small></div>
+                <div class="slot-reel"><span data-reel="2">◆</span><small>Lowrider</small></div>
+              </div>
+              <button class="machine-action" id="spinButton" type="button">Spin 20 <span aria-hidden="true">→</span></button>
+            </div>
+          </section>
+
+          <section class="machine-panel" id="roulettePanel" data-panel="roulette" aria-labelledby="roulette-title" hidden>
+            <div class="machine-copy">
+              <p class="machine-number">02 / MIDNIGHT ROULETTE</p>
+              <h3 id="roulette-title">PICK YOUR<br /><em>COLOR.</em></h3>
+              <p>Choose gold or black. This wheel uses free credits and has no cash value.</p>
+              <div class="choice-row" role="group" aria-label="Choose roulette color">
+                <button class="choice-button is-selected" type="button" data-roulette-choice="gold" aria-pressed="true">Gold</button>
+                <button class="choice-button" type="button" data-roulette-choice="black" aria-pressed="false">Black</button>
+              </div>
+              <div class="machine-result" id="rouletteResult" aria-live="polite">Gold selected.</div>
+            </div>
+            <div class="roulette-machine">
+              <div class="roulette-wheel" id="rouletteWheel" aria-hidden="true">
+                <div class="roulette-center">DR</div>
+              </div>
+              <button class="machine-action" id="rouletteButton" type="button">Roll 30 <span aria-hidden="true">→</span></button>
+            </div>
+          </section>
+
+          <section class="machine-panel" id="flipPanel" data-panel="flip" aria-labelledby="flip-title" hidden>
+            <div class="machine-copy">
+              <p class="machine-number">03 / CHROME FLIP</p>
+              <h3 id="flip-title">DR OR<br /><em>CHROME.</em></h3>
+              <p>Call the side before the coin lands. Correct calls return 20 free credits.</p>
+              <div class="choice-row" role="group" aria-label="Choose coin side">
+                <button class="choice-button is-selected" type="button" data-flip-choice="dr" aria-pressed="true">DR</button>
+                <button class="choice-button" type="button" data-flip-choice="chrome" aria-pressed="false">Chrome</button>
+              </div>
+              <div class="machine-result" id="flipResult" aria-live="polite">DR selected.</div>
+            </div>
+            <div class="flip-machine">
+              <div class="flip-coin" id="flipCoin" aria-hidden="true"><span>DR</span></div>
+              <button class="machine-action" id="flipButton" type="button">Flip 10 <span aria-hidden="true">→</span></button>
+            </div>
+          </section>
+
+          <div class="machine-bottomline">
+            <span id="arcadeStatus" aria-live="polite">Daily DR Credits are stored only on this device.</span>
+            <button id="resetCreditsButton" type="button">Reset demo credits</button>
+          </div>
+        </div>
+
+        <section class="arcade-safety" data-reveal aria-labelledby="safety-title">
+          <p class="eyebrow">Built for entertainment</p>
+          <h2 id="safety-title">YOUR WALLET.<br /><em>YOUR CONTROL.</em></h2>
+          <div class="safety-grid">
+            <article><span>01</span><strong>No seed phrase</strong><p>Don Rashid will never request your recovery phrase or private key.</p></article>
+            <article><span>02</span><strong>No DRC approval</strong><p>The Arcade reads your balance but cannot spend or transfer your tokens.</p></article>
+            <article><span>03</span><strong>No cash value</strong><p>DR Credits cannot be purchased, transferred, redeemed or withdrawn.</p></article>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer arcade-footer">
+    <a class="brand footer-brand" href="/" aria-label="Don Rashid home">
+      <span class="brand-mark" aria-hidden="true">DR</span>
+      <span class="brand-name">DON RASHID</span>
+    </a>
+    <p>West Coast cinematic rap / free-play holder universe</p>
+    <div class="footer-socials">
+      <a href="https://open.spotify.com/artist/0HbtnpVZONVd7S09jqmRZZ" target="_blank" rel="noopener noreferrer">Spotify</a>
+      <a href="https://youtube.com/@donrashidofficial" target="_blank" rel="noopener noreferrer">YouTube</a>
+      <a href="https://x.com/donrashid72" target="_blank" rel="noopener noreferrer">X</a>
+    </div>
+    <small>© <span id="year">2026</span> Don Rashid / DR Arcade</small>
+  </footer>
+
+  <script src="../script.js?v=2"></script>
+  <script src="config.js?v=2"></script>
+  <script type="module" src="arcade.js?v=1"></script>
+</body>
+</html>
