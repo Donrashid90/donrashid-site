@@ -125,9 +125,15 @@ export function rouletteColor(number) {
 
 export function rouletteResult(selection, outcome, stake = GAME_COSTS.roulette) {
   const number = Number(outcome);
-  if (!Number.isInteger(number) || number < 0 || number > 36 || !selection || typeof selection !== "object") {
+  if (!Number.isInteger(number) || number < 0 || number > 36) {
     throw new Error("Invalid roulette selection");
   }
+
+  if (Array.isArray(selection)) {
+    return selection.reduce((total, bet) => total + rouletteResult(bet, number, stake), 0);
+  }
+
+  if (!selection || typeof selection !== "object") throw new Error("Invalid roulette selection");
 
   if (selection.type === "number") {
     const selectedNumber = Number(selection.value);
@@ -142,6 +148,11 @@ export function rouletteResult(selection, outcome, stake = GAME_COSTS.roulette) 
   }
 
   throw new Error("Invalid roulette selection");
+}
+
+export function rouletteBetCost(selections, stake = GAME_COSTS.roulette) {
+  if (!Array.isArray(selections) || !Number.isFinite(stake) || stake < 0) return 0;
+  return selections.length * stake;
 }
 
 export function flipResult(choice, outcome) {
