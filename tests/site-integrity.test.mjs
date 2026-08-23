@@ -13,9 +13,9 @@ const files = Object.fromEntries(await Promise.all([
 
 test("adds Arcade navigation without removing the existing Game route", () => {
   assert.match(files["index.html"], /href="\/game\/">Game<\/a>/);
-  assert.match(files["index.html"], /href="\/arcade\/\?v=3">Arcade<\/a>/);
+  assert.match(files["index.html"], /href="\/arcade\/\?v=4">Arcade<\/a>/);
   assert.match(files["game/index.html"], /class="nav-current" href="\/game\/"/);
-  assert.match(files["game/index.html"], /href="\/arcade\/\?v=3">Arcade<\/a>/);
+  assert.match(files["game/index.html"], /href="\/arcade\/\?v=4">Arcade<\/a>/);
 });
 
 test("preserves the existing five-level game, leaderboard and reward integration", () => {
