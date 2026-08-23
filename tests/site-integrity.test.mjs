@@ -13,9 +13,9 @@ const files = Object.fromEntries(await Promise.all([
 
 test("adds Arcade navigation without removing the existing Game route", () => {
   assert.match(files["index.html"], /href="\/game\/">Game<\/a>/);
-  assert.match(files["index.html"], /href="\/arcade\/\?v=5">Arcade<\/a>/);
+  assert.match(files["index.html"], /href="\/arcade\/\?v=6">Arcade<\/a>/);
   assert.match(files["game/index.html"], /class="nav-current" href="\/game\/"/);
-  assert.match(files["game/index.html"], /href="\/arcade\/\?v=5">Arcade<\/a>/);
+  assert.match(files["game/index.html"], /href="\/arcade\/\?v=6">Arcade<\/a>/);
 });
 
 test("preserves the existing five-level game, leaderboard and reward integration", () => {
@@ -41,6 +41,14 @@ test("upgrades the Arcade with five-reel slots and numbered roulette", () => {
   assert.match(files["arcade/arcade.js"], /\(index \+ 0\.5\) \* step/);
   assert.match(files["arcade/arcade.js"], /ROULETTE_ORDER/);
   assert.match(files["arcade/arcade.js"], /Array\.from\(\{ length: 5 \}/);
+});
+
+test("mirrors the live DR Credit balance inside every free-play machine", () => {
+  const balanceMirrors = files["arcade/index.html"].match(/data-credit-balance/g) || [];
+  assert.equal(balanceMirrors.length, 4);
+  assert.match(files["arcade/index.html"], /class="machine-credit-strip"/);
+  assert.match(files["arcade/arcade.js"], /querySelectorAll\("\[data-credit-balance\]"\)/);
+  assert.match(files["arcade/arcade.js"], /creditBalances\.forEach/);
 });
 
 test("the browser integration contains no token-spending RPC method", () => {
