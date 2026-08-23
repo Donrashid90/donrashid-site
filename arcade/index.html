@@ -30,7 +30,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../style.css?v=7" />
-  <link rel="stylesheet" href="arcade.css?v=5" />
+  <link rel="stylesheet" href="arcade.css?v=6" />
 </head>
 <body class="arcade-page">
   <a class="skip-link" href="#arcade-main">Skip to arcade</a>
@@ -159,7 +159,7 @@
           </div>
           <div class="credit-balance" aria-label="DR Credits balance">
             <span>Daily balance</span>
-            <strong><span id="creditBalance">1,000</span> DR CREDITS</strong>
+            <strong><span id="creditBalance" data-credit-balance>1,000</span> DR CREDITS</strong>
             <small id="creditGrantStatus">Free daily credits loaded</small>
           </div>
         </div>
@@ -186,6 +186,10 @@
           </div>
 
           <section class="machine-panel is-active" id="slotsPanel" data-panel="slots" aria-labelledby="slots-title">
+            <div class="machine-credit-strip" aria-label="Current free DR Credits balance">
+              <span>Available to play</span>
+              <strong><span data-credit-balance>1,000</span> DR CREDITS</strong>
+            </div>
             <div class="machine-copy">
               <p class="machine-number">01 / LOWRIDER SLOTS</p>
               <h3 id="slots-title">FIVE REELS.<br /><em>ONE BOULEVARD.</em></h3>
@@ -204,6 +208,10 @@
           </section>
 
           <section class="machine-panel" id="roulettePanel" data-panel="roulette" aria-labelledby="roulette-title" hidden>
+            <div class="machine-credit-strip" aria-label="Current free DR Credits balance">
+              <span>Available to play</span>
+              <strong><span data-credit-balance>1,000</span> DR CREDITS</strong>
+            </div>
             <div class="machine-copy">
               <p class="machine-number">02 / MIDNIGHT ROULETTE</p>
               <h3 id="roulette-title">PLACE YOUR<br /><em>NIGHT BET.</em></h3>
@@ -230,6 +238,10 @@
           </section>
 
           <section class="machine-panel" id="flipPanel" data-panel="flip" aria-labelledby="flip-title" hidden>
+            <div class="machine-credit-strip" aria-label="Current free DR Credits balance">
+              <span>Available to play</span>
+              <strong><span data-credit-balance>1,000</span> DR CREDITS</strong>
+            </div>
             <div class="machine-copy">
               <p class="machine-number">03 / CHROME FLIP</p>
               <h3 id="flip-title">DR OR<br /><em>CHROME.</em></h3>
@@ -281,6 +293,6 @@
 
   <script src="../script.js?v=2"></script>
   <script src="config.js?v=2"></script>
-  <script type="module" src="arcade.js?v=5"></script>
+  <script type="module" src="arcade.js?v=6"></script>
 </body>
 </html>
