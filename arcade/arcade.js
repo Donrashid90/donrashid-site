@@ -270,7 +270,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const pocket = document.createElement("span");
       pocket.className = `roulette-pocket is-${color}`;
       pocket.textContent = String(number);
-      pocket.style.setProperty("--pocket-angle", `${index * step}deg`);
+      pocket.style.setProperty("--pocket-angle", `${(index + 0.5) * step}deg`);
       roulettePockets.append(pocket);
 
       const start = index * step;
@@ -343,7 +343,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const outcome = secureRandomIndex(37);
     const pocketIndex = ROULETTE_ORDER.indexOf(outcome);
-    const pocketAngle = pocketIndex * (360 / ROULETTE_ORDER.length);
+    const pocketAngle = (pocketIndex + 0.5) * (360 / ROULETTE_ORDER.length);
     rouletteRotation += 1800 + secureRandomIndex(4) * 360;
     const desiredBallAngle = rouletteRotation + pocketAngle;
     rouletteBallRotation -= 2520;
