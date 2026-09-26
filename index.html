@@ -29,7 +29,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=7" />
+  <link rel="stylesheet" href="style.css?v=8" />
 
   <script type="application/ld+json">
   {
@@ -163,20 +163,18 @@
       <div class="section-shell">
         <div class="merch-head" data-reveal>
           <p class="section-index"><span>02</span> Limited edition</p>
-          <p class="merch-status"><i></i> Drop 001 / Available now</p>
+          <p class="merch-status merch-status-sold"><i></i> Drop 001 / Sold out</p>
         </div>
 
-        <div
-          class="merch-editorial"
-          data-reveal
-          data-shop-url="https://shop.donrashid.com">
+        <div class="merch-editorial merch-editorial-sold" data-reveal>
           <div class="drop-visual">
             <div class="drop-visual-top" aria-hidden="true">
               <span>Analog Boulevard</span>
-              <span>Artist edition / 001</span>
+              <span>Sold out / 001</span>
             </div>
             <div class="drop-art-stage">
               <span class="drop-halo" aria-hidden="true"></span>
+              <span class="drop-soldout-stamp" aria-hidden="true">Sold out</span>
               <img
                 class="drop-art"
                 src="assets/analog-boulevard-drop-001.webp"
@@ -192,15 +190,15 @@
           </div>
 
           <div class="merch-copy">
-            <p class="eyebrow">Drop 001 / Available now</p>
-            <h2>Wear the<br /><em>night.</em></h2>
-            <p>Analog Boulevard translates the Don Rashid sound into a limited artist edition: a restrained signature on the chest, a cinematic lowrider statement on the back.</p>
+            <p class="eyebrow">Drop 001 / Sold out</p>
+            <h2>Gone for<br /><em>good.</em></h2>
+            <p>Analog Boulevard marked the first Don Rashid artist edition. The complete drop is now sold out and permanently retired.</p>
 
             <div class="merch-edition">
               <img src="assets/dr-monogram-gold.webp" width="600" height="522" loading="lazy" alt="" aria-hidden="true" />
               <div>
                 <strong>Limited artist edition</strong>
-                <span>Limited Drop 001 / No restock. No reprint.</span>
+                <span>Sold out worldwide / No restock. No reprint.</span>
               </div>
             </div>
 
@@ -211,14 +209,26 @@
             </ul>
 
             <div class="merch-actions">
-              <a class="action action-primary" href="https://shop.donrashid.com">Shop the drop <span aria-hidden="true">&#8599;&#65038;</span></a>
-              <a class="merch-alert" href="mailto:contact@donrashid.com?subject=Analog%20Boulevard%20Drop%20001">Get drop alert <span class="arrow" aria-hidden="true">&#8599;&#65038;</span></a>
+              <span class="action merch-soldout">Sold out <span aria-hidden="true">×</span></span>
+              <a class="merch-alert" href="#drop-002">Drop 002 preview <span aria-hidden="true">↓</span></a>
             </div>
-            <p class="merch-quality-note">Official Don Rashid store now open.</p>
+            <p class="merch-quality-note">Drop 001 is permanently retired.</p>
           </div>
 
           <span class="drop-number" aria-hidden="true">001</span>
         </div>
+
+        <aside id="drop-002" class="drop-next" data-reveal aria-labelledby="drop-002-title">
+          <div class="drop-next-mark" aria-hidden="true">
+            <span class="drop-next-number">002</span>
+          </div>
+          <div class="drop-next-copy">
+            <p class="eyebrow">Next release / Coming soon</p>
+            <h3 id="drop-002-title">Drop 002<br />is loading.</h3>
+            <p>The next Don Rashid artist edition is in development. Name, artwork and release date will be revealed soon.</p>
+            <a class="merch-alert" href="mailto:contact@donrashid.com?subject=Don%20Rashid%20Drop%20002%20Alert">Get Drop 002 alert <span class="arrow" aria-hidden="true">&#8599;&#65038;</span></a>
+          </div>
+        </aside>
       </div>
     </section>
 
