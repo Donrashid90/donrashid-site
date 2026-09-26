@@ -1871,3 +1871,107 @@ button {
     padding: 32px 22px 38px;
   }
 }
+
+
+/* DROP 002 ARTWORK */
+.drop-next-with-art {
+  grid-template-columns: minmax(380px, .9fr) minmax(0, 1.1fr);
+  border-color: rgba(33, 192, 235, .24);
+  background:
+    radial-gradient(circle at 18% 50%, rgba(16, 157, 212, .11), transparent 34%),
+    radial-gradient(circle at 68% 28%, rgba(230, 25, 155, .07), transparent 32%),
+    linear-gradient(115deg, #080b10, #070708 68%);
+}
+
+.drop-next-with-art .drop-next-mark {
+  min-height: 470px;
+  isolation: isolate;
+  background:
+    radial-gradient(circle at 50% 52%, rgba(13, 144, 198, .18), transparent 36%),
+    radial-gradient(circle at 66% 55%, rgba(227, 26, 154, .1), transparent 34%),
+    #080a0d;
+}
+
+.drop-next-with-art .drop-next-mark::before,
+.drop-next-with-art .drop-next-mark::after {
+  display: none;
+}
+
+.drop-next-art {
+  position: relative;
+  z-index: 2;
+  width: min(96%, 620px);
+  height: auto;
+  max-height: 440px;
+  object-fit: contain;
+  filter:
+    drop-shadow(0 24px 34px rgba(0, 0, 0, .72))
+    drop-shadow(0 0 24px rgba(23, 176, 226, .11));
+  transition: transform .7s cubic-bezier(.2,.7,.2,1), filter .7s ease;
+}
+
+.drop-next-with-art:hover .drop-next-art {
+  transform: scale(1.018);
+  filter:
+    drop-shadow(0 28px 40px rgba(0, 0, 0, .76))
+    drop-shadow(0 0 30px rgba(226, 28, 158, .12));
+}
+
+.drop-next-with-art .drop-next-number {
+  position: absolute;
+  left: 18px;
+  bottom: -22px;
+  z-index: 1;
+  color: rgba(243, 240, 233, .045);
+  font-size: clamp(110px, 14vw, 210px);
+  -webkit-text-stroke: 0;
+  text-stroke: 0;
+}
+
+@media (max-width: 1050px) {
+  .drop-next-with-art {
+    grid-template-columns: minmax(340px, .9fr) minmax(0, 1.1fr);
+  }
+}
+
+@media (max-width: 820px) {
+  .drop-next-with-art {
+    grid-template-columns: 1fr;
+  }
+
+  .drop-next-with-art .drop-next-mark {
+    min-height: 430px;
+  }
+
+  .drop-next-art {
+    width: min(88%, 570px);
+    max-height: 390px;
+  }
+}
+
+@media (max-width: 600px) {
+  .drop-next-with-art .drop-next-mark {
+    min-height: 350px;
+  }
+
+  .drop-next-art {
+    width: 94%;
+    max-height: 330px;
+  }
+
+  .drop-next-with-art .drop-next-number {
+    left: 8px;
+    bottom: -14px;
+    font-size: 100px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drop-next-art {
+    transition: none;
+  }
+
+  .drop-next-with-art:hover .drop-next-art {
+    transform: none;
+  }
+}
