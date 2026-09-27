@@ -31,6 +31,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css?v=9" />
 
+  <style>
+    .trade-shortcut { position:fixed; right:20px; bottom:calc(20px + env(safe-area-inset-bottom, 0px)); z-index:120; display:inline-flex; align-items:center; justify-content:center; min-width:100px; min-height:48px; padding:12px 19px; border:1px solid #edd498; background:#cba25b; color:#070708; box-shadow:0 8px 28px rgba(0,0,0,.45); font:700 14px/1 Manrope,Arial,sans-serif; letter-spacing:.09em; text-decoration:none; text-transform:uppercase; }
+    .trade-shortcut:hover, .trade-shortcut:focus-visible { background:#edd498; }
+  </style>
+
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -74,6 +79,8 @@
     </nav>
   </header>
 
+  <a class="trade-shortcut" href="/trade/">Trade</a>
+
   <main id="main-content">
     <section class="hero" aria-labelledby="hero-title">
       <div class="hero-media" role="img" aria-label="Don Rashid in a cinematic night setting"></div>
@@ -94,7 +101,6 @@
           <div class="hero-actions">
             <a class="action action-primary" href="#music">Enter the sound <span aria-hidden="true">↓</span></a>
             <a class="action action-ghost" href="https://youtube.com/@donrashidofficial" target="_blank" rel="noopener noreferrer">Watch on YouTube <span class="arrow" aria-hidden="true">&#8599;&#65038;</span></a>
-            <a class="action action-ghost" href="/trade/">Trade <span class="arrow" aria-hidden="true">&#8599;&#65038;</span></a>
           </div>
         </div>
       </div>
