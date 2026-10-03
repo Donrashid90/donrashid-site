@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Lowrider City 3D — Don Rashid</title>
+  <meta name="description" content="Cruise a 3D West Coast city, hit the hydraulics and complete six lowrider missions. The second official Don Rashid browser game.">
+  <meta name="theme-color" content="#101117"><link rel="icon" href="/assets/favicon.svg">
+  <link rel="canonical" href="https://donrashid.com/lowrider/">
+  <link rel="stylesheet" href="city.css?v=1">
+</head>
+<body>
+  <header class="topbar"><a class="brand" href="/">DR <span>DON RASHID</span></a><nav aria-label="Games"><a href="/game/">01 · Night Run</a><a href="/lowrider/" aria-current="page">02 · City 3D</a><a href="/arcade/">Arcade</a></nav><button id="garageButton">Garage</button></header>
+  <main id="world" tabindex="-1" aria-label="Lowrider City 3D game">
+    <canvas id="cityCanvas" aria-label="3D driving view. Drive with WASD or arrow keys; Space for hydraulics, Shift to brake, P to pause."></canvas>
+    <div class="vignette" aria-hidden="true"></div>
+    <div class="district"><span>DON RASHID / GAME 002</span><strong id="districtName">PALM BOULEVARD</strong><small id="badge">STREET CRUISER</small></div>
+    <section class="mission-panel" aria-label="Current mission"><span id="missionTag">FREE ROAM</span><strong id="missionName">The boulevard is yours.</strong><p id="missionHint">Start a mission or explore the city.</p><div><b id="timer">—</b><span id="checkpoint">6 missions</span></div></section>
+    <div id="toast" role="status" aria-live="polite"></div>
+    <div class="map-panel"><canvas id="minimap" width="220" height="220" aria-label="City map: your car is white, checkpoint is gold"></canvas><span id="mapLabel">PALM BOULEVARD</span></div>
+    <div class="speed-panel"><strong id="speed">0</strong><span>KM/H</span><div id="gear">N</div></div>
+    <div class="toolbar"><button id="missionButton">Start mission</button><button id="cameraButton">Camera</button><button id="pauseButton">Pause</button><button id="fullscreenButton">Fullscreen</button><button id="resetButton">Reset car</button></div>
+    <div class="touch-controls" aria-label="Touch driving controls"><div><button data-key="ArrowLeft" aria-label="Steer left">◀</button><button data-key="ArrowRight" aria-label="Steer right">▶</button></div><div><button id="hopTouch" aria-label="Hydraulic hop">HOP</button><button data-key="ArrowDown" aria-label="Brake and reverse">REV</button><button data-key="ArrowUp" aria-label="Accelerate">GAS</button></div></div>
+    <div class="overlay" id="startOverlay"><section class="start-card"><span class="eyebrow">DON RASHID PRESENTS · GAME 002</span><h1>LOWRIDER<br><em>CITY 3D</em></h1><p>Chrome in the sunset. Six missions. Your city.</p><div class="control-guide"><span><b>WASD / ARROWS</b>Drive</span><span><b>SPACE</b>Hydraulics</span><span><b>SHIFT</b>Handbrake</span><span><b>C / P</b>Camera / Pause</span></div><button class="primary" id="startButton" disabled>Loading city…</button><p class="fine" id="loadingMessage">Preparing the 3D streets. WebGL 2 is required.</p><a href="/game/">Play Game 001 · Night Run</a></section></div>
+    <div class="overlay" id="pauseOverlay" hidden><section class="start-card compact"><span class="eyebrow">TAKE A BREATHER</span><h2>CRUISE PAUSED</h2><p>The mission timer is paused too.</p><button class="primary" id="resumeButton">Resume driving</button></section></div>
+    <dialog id="garage"><div class="garage-heading"><div><span class="eyebrow">CUSTOMS / DON RASHID</span><h2>YOUR GARAGE</h2></div><button id="closeGarage" aria-label="Close garage">✕</button></div><p>Unlock eight finishes by completing levels in <a href="/game/">Night Run</a>. Select a finish to equip it in both games.</p><div id="paintGrid"></div><h3>City mission rewards</h3><div id="cityRewards"></div><p class="fine" id="saveStatus">Progress is saved only in this browser. No wallet or payment needed.</p></dialog>
+  </main>
+  <script src="/game/progress.js?v=1"></script>
+  <script type="module" src="city.js?v=1"></script>
+  <noscript><p class="noscript">Enable JavaScript to play Lowrider City 3D.</p></noscript>
+</body></html>

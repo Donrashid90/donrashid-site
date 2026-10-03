@@ -30,7 +30,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../style.css?v=7" />
-  <link rel="stylesheet" href="game.css?v=7" />
+  <link rel="stylesheet" href="game.css?v=9" />
 </head>
 <body class="game-page">
   <a class="skip-link" href="#game-main">Skip to game</a>
@@ -62,6 +62,7 @@
     <section class="game-hero" aria-labelledby="game-title">
       <div class="game-ambient" aria-hidden="true"></div>
       <div class="game-shell">
+        <nav class="game-switcher" aria-label="Choose a game"><a aria-current="page" href="/game/">01 · Night Run / 20 levels</a><a href="/lowrider/">02 · Lowrider City / 3D</a></nav>
         <div class="game-intro" data-reveal>
           <div>
             <p class="section-index"><span>04</span> Interactive</p>
@@ -69,7 +70,7 @@
             <h1 id="game-title">LOWRIDER<br /><em>NIGHT RUN</em></h1>
           </div>
           <div class="game-intro-copy">
-            <p>Twenty districts. Twenty upgraded lowriders. Claim the Level 5 reward, then conquer the full boulevard campaign.</p>
+            <p>Twenty districts. Eight permanent garage unlocks. Clear the campaign and take your custom paint into Lowrider City 3D.</p>
             <div class="game-specs" aria-label="Game details">
               <span>One-touch control</span>
               <span>3 motors per run</span>
@@ -192,6 +193,11 @@
           <small class="leaderboard-note">Only a public nickname, score, highest level and run time are saved.</small>
         </section>
 
+        <section class="campaign-garage" aria-labelledby="garage-title">
+          <p class="eyebrow">Campaign rewards · Both games</p><h2 id="garage-title">YOUR GARAGE</h2>
+          <p id="rewardProgress" aria-live="polite"></p><div id="rewardGrid" class="reward-grid"></div>
+          <p id="rewardStorage"></p><a class="action action-primary" href="/lowrider/">Drive in Lowrider City 3D</a>
+        </section>
         <div class="game-after" data-reveal>
           <div>
             <p class="eyebrow">The rules</p>
@@ -228,6 +234,8 @@
   </footer>
 
   <script src="../script.js?v=2"></script>
-  <script src="game.js?v=8"></script>
+  <script src="progress.js?v=1"></script>
+  <script src="garage.js?v=1"></script>
+  <script src="game.js?v=9"></script>
 </body>
 </html>

@@ -4,6 +4,9 @@
   "type": "module",
   "scripts": {
     "test": "node --test tests/*.test.mjs",
-    "check": "node --check script.js && node --check game/game.js && node --check arcade/core.js && node --check arcade/arcade.js && node --test tests/*.test.mjs"
+    "check": "node --check script.js && node --check game/game.js && node --check game/progress.js && node --check game/garage.js && node --check lowrider/city.js && node --check lowrider/core.js && node --check arcade/core.js && node --check arcade/arcade.js && node --test tests/*.test.mjs"
+  },
+  "dependencies": {
+    "three": "0.180.0"
   }
 }

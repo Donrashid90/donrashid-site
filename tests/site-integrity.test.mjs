@@ -15,11 +15,11 @@ test("adds Arcade navigation without removing the existing Game route", () => {
   assert.match(files["index.html"], /href="\/game\/">Game<\/a>/);
   assert.match(files["index.html"], /href="\/arcade\/\?v=6">Arcade<\/a>/);
   assert.match(files["game/index.html"], /class="nav-current" href="\/game\/"/);
-  assert.match(files["game/index.html"], /href="\/arcade\/\?v=6">Arcade<\/a>/);
+  assert.match(files["game/index.html"], /href="\/arcade\/\?v=\d+">Arcade<\/a>/);
 });
 
-test("preserves the existing five-level game, leaderboard and reward integration", () => {
-  assert.match(files["game/index.html"], /Five-level campaign/);
+test("preserves the twenty-level game, leaderboard and shop reward integration", () => {
+  assert.match(files["game/index.html"], /20-level campaign/);
   assert.match(files["game/index.html"], /don-rashid-leaderboard\.chummy-knoll-6431\.chatgpt\.site/);
   assert.match(files["game/index.html"], /id="promoReward"/);
 });

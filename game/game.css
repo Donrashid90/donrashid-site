@@ -4,6 +4,18 @@
     var(--bg);
 }
 
+.game-switcher {display:flex;flex-wrap:wrap;gap:12px;margin:0 0 36px;font-size:14px}
+.game-switcher a {padding:14px 20px;border:1px solid #575048;color:#e8d6aa}
+.game-switcher a[aria-current] {background:#cba25b;color:#090909}
+.campaign-garage {margin-top:60px;padding:28px;border:1px solid #494138;background:#101112}
+.campaign-garage h2 {font-family:var(--display);font-size:clamp(24px,4vw,44px);margin:12px 0}
+.campaign-garage p {font-size:16px;line-height:1.65;margin-bottom:18px;color:#c5c3be}
+.reward-grid {display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:24px 0}
+.reward-card {border:1px solid #45413b;border-top:5px solid var(--paint);background:#18191c;color:#eee;text-align:left;padding:18px;display:grid;gap:10px;cursor:pointer}
+.reward-card span,.reward-card small {font-size:14px;line-height:1.5}.reward-card strong {font-size:18px}
+.reward-card[aria-pressed="true"] {outline:2px solid #e6c582;outline-offset:2px}
+.reward-card:disabled {opacity:.5;cursor:not-allowed}
+
 .game-page .site-header {
   background: rgba(7, 7, 8, .9);
   border-color: var(--line);

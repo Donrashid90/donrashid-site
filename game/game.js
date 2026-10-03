@@ -256,7 +256,13 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       : base.vehicle;
 
-    if (!neonMap && !chromeBuild) return base;
+    const cosmetic = window.DRProgress?.equipped();
+    const customVehicle = cosmetic ? {
+      ...vehicle, top: cosmetic.color, middle: cosmetic.color, bottom: '#101016',
+      glow: cosmetic.level >= 10 ? cosmetic.color : vehicle.glow,
+      wheel: cosmetic.level >= 15 ? '#f4d58b' : vehicle.wheel,
+    } : vehicle;
+    if (!neonMap && !chromeBuild && !cosmetic) return base;
     return {
       ...base,
       ...(neonMap ? {
@@ -268,7 +274,7 @@ document.addEventListener("DOMContentLoaded", () => {
         sky: ["#03060a", "#08262d", "#173f49", "#05090b"],
         callout: "HOLDER EXCLUSIVE",
       } : {}),
-      vehicle,
+      vehicle: customVehicle,
     };
   }
 
@@ -715,6 +721,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function completeLevel() {
     if (mode !== "running") return;
     const completedLevel = currentLevel;
+    window.DRProgress?.complete(completedLevel);
     const completedConfig = getLevelConfig();
     const sequence = runSequence;
     score += 500 * completedLevel;
@@ -2295,6 +2302,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (copyPromoButton) copyPromoButton.addEventListener("click", () => void copyPromoCode());
 
   document.addEventListener("keydown", (event) => {
+    if (event.target.closest('input, textarea, select, button, a')) return;
     if (["Space", "ArrowUp", "KeyW"].includes(event.code)) {
       if (event.repeat) return;
       handlePrimaryAction(event);
@@ -2316,6 +2324,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   window.addEventListener("resize", resizeCanvas, { passive: true });
+  window.addEventListener('dr-progress', () => { if (mode !== 'running') drawScene(); });
 
   resetScoreEntry();
   resetPromoReward();
