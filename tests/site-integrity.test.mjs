@@ -4,6 +4,7 @@ import { readFile } from "node:fs/promises";
 
 const files = Object.fromEntries(await Promise.all([
   "index.html",
+  "games/index.html",
   "game/index.html",
   "arcade/index.html",
   "arcade/arcade.js",
@@ -12,9 +13,12 @@ const files = Object.fromEntries(await Promise.all([
 ].map(async (path) => [path, await readFile(new URL(`../${path}`, import.meta.url), "utf8")])));
 
 test("adds Arcade navigation without removing the existing Game route", () => {
-  assert.match(files["index.html"], /href="\/game\/">Game<\/a>/);
+  assert.match(files["index.html"], /href="\/games\/">Game<\/a>/);
+  assert.doesNotMatch(files["index.html"], /Game 2 · 3D/);
+  assert.match(files["games/index.html"], /href="\/game\/"/);
+  assert.match(files["games/index.html"], /href="\/lowrider\/"/);
   assert.match(files["index.html"], /href="\/arcade\/\?v=6">Arcade<\/a>/);
-  assert.match(files["game/index.html"], /class="nav-current" href="\/game\/"/);
+  assert.match(files["game/index.html"], /class="nav-current" href="\/games\/"/);
   assert.match(files["game/index.html"], /href="\/arcade\/\?v=\d+">Arcade<\/a>/);
 });
 
