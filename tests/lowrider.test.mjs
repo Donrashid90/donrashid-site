@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {readFileSync} from 'node:fs';
-import {drive,collides,MISSIONS,reached} from '../lowrider/core.js';
+import {drive,collides,MISSIONS,reached,WORLD_LIMIT,DISTRICTS,districtAt,ROADS} from '../lowrider/core.js';
 
 test('driving accelerates, reverses, turns and respects collisions',()=>{
   const s={x:0,z:0,angle:0,speed:0};
@@ -12,11 +12,19 @@ test('driving accelerates, reverses, turns and respects collisions',()=>{
   const wall=[{x:0,z:-10,w:20,d:5}];const c={x:0,z:-4,angle:0,speed:30};
   assert.equal(drive(c,{forward:true},.1,wall),true);assert.ok(c.speed<0);assert.equal(c.z,-4);
   const reverse={x:0,z:0,angle:0,speed:0};drive(reverse,{back:true},.1,[]);assert.ok(reverse.z>0);
-  assert.equal(collides(270,0,[]),true);
+  assert.equal(collides(480,0,[]),false);
+  assert.equal(collides(WORLD_LIMIT+1,0,[]),true);
+  assert.equal(collides(0,-WORLD_LIMIT-1,[]),true);
 });
 test('mission checkpoints are reachable on roads within the city',()=>{
   assert.equal(MISSIONS.length,6);
-  for(const m of MISSIONS){assert.ok(m.time>=100);for(const p of m.points){assert.ok(Math.abs(p[0])<=240&&Math.abs(p[1])<=240);assert.ok(p[0]%80===0&&p[1]%80===0);assert.ok(reached({x:p[0],z:p[1]},p));}}
+  for(const m of MISSIONS){assert.ok(m.time>=100);for(const p of m.points){assert.ok(Math.abs(p[0])<WORLD_LIMIT&&Math.abs(p[1])<WORLD_LIMIT);assert.ok(ROADS.includes(p[0])&&ROADS.includes(p[1]));assert.ok(reached({x:p[0],z:p[1]},p));}}
+});
+test('six themed districts cover the expanded city and final tour',()=>{
+  assert.equal(ROADS.length,13);
+  for(const d of DISTRICTS)assert.equal(districtAt(d.x,d.z).id,d.id);
+  for(let x=-500;x<=500;x+=20)for(let z=-500;z<=500;z+=20)assert.ok(DISTRICTS.includes(districtAt(x,z)));
+  assert.equal(new Set(MISSIONS.at(-1).points.map(([x,z])=>districtAt(x,z).id)).size,6);
 });
 test('cosmetics unlock at milestones, persist and cannot select locked finishes',()=>{
   const store=new Map();const localStorage={getItem:k=>store.get(k)||null,setItem:(k,v)=>store.set(k,v)};

@@ -1,5 +1,5 @@
 import * as THREE from './vendor/three.module.min.js';
-import {ROADS, MISSIONS, drive, reached} from './core.js';
+import {ROADS, MISSIONS, WORLD_LIMIT, DISTRICTS, districtAt, drive, reached} from './core.js?v=3';
 
 const $ = id => document.getElementById(id);
 const world=$('world'), progress=window.DRProgress;
@@ -27,7 +27,7 @@ function init(){
   const scene=new THREE.Scene(); scene.background=new THREE.Color('#d29189');
   scene.fog=new THREE.Fog('#cb9291',100,390);
   const camera=new THREE.PerspectiveCamera(58,1,.15,850);
-  scene.add(new THREE.HemisphereLight('#c6d3ff','#664334',2.5));
+  const ambient=new THREE.HemisphereLight('#c6d3ff','#664334',2.5);scene.add(ambient);
   const sunLight=new THREE.DirectionalLight('#ffd4a0',3.3);sunLight.position.set(-140,90,-180);scene.add(sunLight);
   const rim=new THREE.DirectionalLight('#999dff',1.1);rim.position.set(100,35,90);scene.add(rim);
   const scenery=new THREE.Group();scene.add(scenery);
@@ -49,12 +49,13 @@ function init(){
   function cyl(radius,height,x,y,z,material,parent=scenery){
     const mesh=new THREE.Mesh(cylinder,material);mesh.scale.set(radius,height,radius);mesh.position.set(x,y,z);parent.add(mesh);return mesh;
   }
-  box(550,.3,550,0,-.25,0,mat('#8c8171'));
-  box(160,.15,900,355,-.35,0,mat('#367d86',.3,.3));
-  box(26,.2,560,281,-.06,0,mat('#dcc7a1'));
+  box(1030,.3,1030,0,-.25,0,mat('#8c8171'));
+  for(const district of DISTRICTS)box(320,.04,480,district.x,-.07,district.z,mat(district.ground));
+  box(300,.15,1400,670,-.35,0,mat('#367d86',.3,.3));
+  box(26,.2,1030,521,-.06,0,mat('#dcc7a1'));
   for(const r of ROADS){
-    box(23,.12,550,r,.02,0,asphalt);box(550,.12,23,0,.025,r,asphalt);
-    for(let t=-263;t<268;t+=12){
+    box(23,.12,1030,r,.02,0,asphalt);box(1030,.12,23,0,.025,r,asphalt);
+    for(let t=-503;t<508;t+=12){
       if(ROADS.some(j=>Math.abs(t-j)<16))continue;
       box(.24,.025,5,r,.095,t,roadPaint);box(5,.025,.24,t,.1,r,roadPaint);
     }
@@ -68,31 +69,45 @@ function init(){
   const blocks=[];
   const windowWarm=glow('#efc498'), windowCool=glow('#9fbdbd');
   let seed=51;const rand=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;};
-  function building(x,z,w,d,h,index){
+  function building(x,z,w,d,h,index,theme='palm'){
     blocks.push({x,z,w,d});
-    const wall=mat(['#566679','#a18b83','#786e8b','#586d72','#8c7777'][index%5]);
+    const palettes={neon:['#202039','#29243d','#172d40'],ghost:['#60554b','#76634f','#514d49'],desert:['#c69569','#b47755','#d1ae83'],barrio:['#d96753','#e2b54c','#46a699','#8e76bd'],coast:['#d9d0bb','#9dc9cd','#d6a997'],palm:['#566679','#a18b83','#786e8b','#586d72','#8c7777']};
+    const palette=palettes[theme];const wall=mat(palette[index%palette.length]);
     box(w,h,d,x,h/2,z,wall);box(w+1,.7,d+1,x,h+.25,z,mat('#d0bbae'));
     box(w*.5,1.7,d*.5,x,h+1.35,z,wall);
-    for(let y=3;y<h-1;y+=3.8){
+    for(let y=3;y<h-1;y+=theme==='neon'?6:5){
       for(let wx=-w/2+2;wx<w/2-1;wx+=3.6){
-        const material=rand()>.45?windowWarm:windowCool;
+        const material=theme==='ghost'?mat('#272a2b'):theme==='neon'?(index%2?pink:aqua):rand()>.45?windowWarm:windowCool;
         box(1.35,1.6,.12,x+wx,y,z+d/2+.07,material);box(1.35,1.6,.12,x+wx,y,z-d/2-.07,material);
       }
       for(let wz=-d/2+2;wz<d/2-1;wz+=3.6){
-        box(.12,1.6,1.35,x+w/2+.07,y,z+wz,windowWarm);box(.12,1.6,1.35,x-w/2-.07,y,z+wz,windowCool);
+        const side=theme==='ghost'?mat('#272a2b'):theme==='neon'?(index%2?aqua:pink):windowWarm;
+        box(.12,1.6,1.35,x+w/2+.07,y,z+wz,side);box(.12,1.6,1.35,x-w/2-.07,y,z+wz,side);
       }
     }
-    box(w,.3,.3,x,2.5,z+d/2+.2,index%2?pink:aqua);
+    if(theme==='neon'){
+      for(const y of [2.5,h]){box(w+.3,.25,d+.3,x,y,z,index%2?pink:aqua);}
+      for(const dx of [-w/2,w/2])box(.25,h,.25,x+dx,h/2,z+d/2+.2,aqua);
+    }else if(theme!=='ghost'&&theme!=='desert')box(w,.3,.3,x,2.5,z+d/2+.2,index%2?pink:aqua);
+    if(theme==='ghost')for(const dx of [-w/3,0,w/3]){const plank=box(3,.3,.25,x+dx,3,z+d/2+.3,trunkMat);plank.rotation.z=.35;}
+    if(theme==='barrio')box(w+2,.3,4,x,3,z+d/2+1,mat(index%2?'#e7ba51':'#41b3ae'));
   }
-  for(let ix=0;ix<6;ix++)for(let iz=0;iz<6;iz++){
-    const x=-200+ix*80,z=-200+iz*80;
+  for(let ix=0;ix<12;ix++)for(let iz=0;iz<12;iz++){
+    const x=-440+ix*80,z=-440+iz*80,theme=districtAt(x,z).id;
     box(54,.35,54,x,.13,z,sidewalk);
     // Lower coastal blocks, taller downtown, an open customs courtyard.
-    if(ix===3&&iz===3){box(37,.12,38,x,.36,z,mat('#49434d'));continue;}
-    const height=(ix<2?20:9)+rand()*22;
-    building(x-12,z,19,37,height,ix+iz);
-    building(x+12,z-9,18,18,height*.65,ix+iz+1);
-    building(x+12,z+13,18,18,height*.45,ix+iz+2);
+    if(ix===6&&iz===6){box(37,.12,38,x,.36,z,mat('#49434d'));continue;}
+    if(theme==='desert'){
+      box(58,.4,58,x,.25,z,mat('#c79a62'));
+      if((ix+iz)%3===0)building(x,z,25,18,6,ix+iz,theme);
+      for(let k=0;k<3;k++){const cx=x-18+k*16,cz=z+15;cyl(.6,7,cx,3.5,cz,mat('#56724c'));box(3,.8,.8,cx+1,4,cz,mat('#56724c'));cyl(.4,2,cx+2.3,4.8,cz,mat('#56724c'));}
+      continue;
+    }
+    const height=theme==='neon'?25+rand()*35:theme==='ghost'?5+rand()*7:theme==='barrio'?7+rand()*9:9+rand()*16;
+    building(x-12,z,19,37,height,ix+iz,theme);
+    building(x+12,z-9,18,18,height*.65,ix+iz+1,theme);
+    if(theme!=='ghost')building(x+12,z+13,18,18,height*.45,ix+iz+2,theme);
+    else{cyl(.6,10,x+16,5,z+18,trunkMat);box(8,.5,.5,x+16,8,z+18,trunkMat);}
   }
   const leafGeometry=new THREE.ConeGeometry(1,1,4);
   function palm(x,z,h=14){
@@ -104,17 +119,17 @@ function init(){
       leaf.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),new THREE.Vector3(Math.cos(a),-.18,Math.sin(a)).normalize());scenery.add(leaf);
     }
   }
-  for(let z=-248;z<=248;z+=26){palm(260,z,13+rand()*4);palm(-14,z,11+rand()*4);}
-  for(let x=-220;x<240;x+=40){palm(x,14,12);palm(x,174,13);}
+  for(let z=14;z<=488;z+=32){palm(498,z,13+rand()*4);palm(-14,z,11+rand()*4);}
+  for(let x=-460;x<480;x+=40){palm(x,14,12);palm(x,334,13);}
   for(let z=-230;z<250;z+=40){
     cyl(.16,8,13,4,z,chrome);box(3,.15,.25,11.6,8,z,chrome);box(1.8,.12,.7,10.9,7.9,z,windowWarm);
   }
   // Horizon: layered hills and a low sun, all world-space geometry.
   for(let i=0;i<18;i++){
     const hill=new THREE.Mesh(new THREE.ConeGeometry(38+rand()*42,35+rand()*50,6),mat('#827a93'));
-    hill.position.set(-460+i*52,4,-355-rand()*35);scenery.add(hill);
+    hill.position.set(-620+i*72,4,-565-rand()*35);scenery.add(hill);
   }
-  const sun=new THREE.Mesh(new THREE.SphereGeometry(23,24,16),glow('#ffd498'));sun.position.set(-175,55,-330);scene.add(sun);
+  const sun=new THREE.Mesh(new THREE.SphereGeometry(23,24,16),glow('#ffd498'));sun.position.set(-175,85,-640);scene.add(sun);
   function sign(text,x,y,z,color='#f4d18e',rotation=0){
     const c=document.createElement('canvas');c.width=512;c.height=128;const g=c.getContext('2d');
     g.fillStyle='#141d29';g.fillRect(0,0,512,128);g.strokeStyle=color;g.lineWidth=6;g.strokeRect(5,5,502,118);
@@ -124,7 +139,17 @@ function init(){
     mesh.position.set(x,y,z);mesh.rotation.y=rotation;scenery.add(mesh);
   }
   sign('DON RASHID',-40,12,-20);sign('CHROME CUSTOMS',40,6,62,'#70efdb');sign('AFTER DARK',-120,11,-20,'#ff9acc');
-  sign('PACIFIC COAST',253,7,-35,'#f4d18e',Math.PI/2);sign('3072 RECORDS',-40,9,100);
+  sign('PACIFIC COAST',493,7,45,'#f4d18e',Math.PI/2);sign('3072 RECORDS',-40,9,100);
+  for(const d of DISTRICTS)sign(d.name,d.x+40,9,d.z+22,d.id==='neon'?'#ff5cdb':'#f4d18e');
+  sign('LAST STOP GAS',360,7,-378);sign('GHOST SALOON',-360,8,-378);sign('NEON SOCIAL CLUB',40,13,-378,'#ff5cdb');sign('BARRIO LOW & SLOW',-360,8,102,'#70efdb');
+  // Desert gas canopy, ghost-town water tower and coastal promenade.
+  box(35,1,20,360,8,-360,mat('#a7523d'));
+  for(const x of [346,374])for(const z of [-367,-353])cyl(.4,8,x,4,z,chrome);
+  blocks.push({x:360,z:-360,w:35,d:20});
+  cyl(6,8,-280,19,-360,mat('#69594a'));
+  for(const x of [-284,-276])for(const z of [-364,-356])box(.6,16,.6,x,8,z,trunkMat);
+  blocks.push({x:-280,z:-360,w:13,d:13});
+  for(let z=30;z<480;z+=30){box(8,.6,2,498,1,z,trunkMat);}
   box(25,5,10,40,2.9,58,mat('#353443'));blocks.push({x:40,z:58,w:25,d:10});
   // Instance static repeated geometry to keep mobile draw calls low.
   scenery.updateMatrixWorld(true);
@@ -271,10 +296,13 @@ function init(){
   const held=(...names)=>names.some(n=>keys.has(n)||touch.has(n));
   function minimap(){
     map.fillStyle='#141e2a';map.fillRect(0,0,220,220);
-    const xy=v=>110+v*.37;
+    const xy=v=>110+v*(102/WORLD_LIMIT);
+    for(const d of DISTRICTS){map.fillStyle=d.color;map.globalAlpha=.45;map.fillRect(xy(d.x-160),xy(d.z-240),320*102/WORLD_LIMIT,480*102/WORLD_LIMIT);}map.globalAlpha=1;
     map.fillStyle='#29606a';map.fillRect(211,0,9,220);
-    map.strokeStyle='#596675';map.lineWidth=6;
+    map.strokeStyle='#7b8693';map.lineWidth=2;
     for(const r of ROADS){map.beginPath();map.moveTo(xy(r),8);map.lineTo(xy(r),212);map.moveTo(8,xy(r));map.lineTo(212,xy(r));map.stroke();}
+    map.font='bold 10px sans-serif';map.textAlign='center';map.fillStyle='#fff';
+    for(const d of DISTRICTS)map.fillText(d.id.toUpperCase(),xy(d.x),xy(d.z)-20);
     if(mission){
       const p=mission.points[Math.min(pointIndex,mission.points.length-1)];
       map.strokeStyle='#e5c273';map.lineWidth=1.5;map.setLineDash([3,4]);map.beginPath();map.moveTo(xy(s.x),xy(s.z));map.lineTo(xy(p[0]),xy(p[1]));map.stroke();map.setLineDash([]);
@@ -283,7 +311,7 @@ function init(){
     map.save();map.translate(xy(s.x),xy(s.z));map.rotate(-s.angle);map.fillStyle='#fff7e6';map.beginPath();map.moveTo(0,-7);map.lineTo(5,5);map.lineTo(0,2);map.lineTo(-5,5);map.closePath();map.fill();map.restore();
   }
   function hud(){
-    const district=s.x>200?'PACIFIC COAST':s.x< -100?'DOWNTOWN':s.z>120?'SUNSET STRIP':'PALM BOULEVARD';
+    const district=districtAt(s.x,s.z).name;
     $('districtName').textContent=district;$('mapLabel').textContent=district;
     $('speed').textContent=Math.round(Math.abs(s.speed)*3.6);$('gear').textContent=s.speed<-.3?'R':s.speed<.3?'N':String(Math.min(4,1+Math.floor(s.speed/9)));
     $('missionTag').textContent=mission?`MISSION ${missionIndex+1} / 6`:'FREE ROAM';
@@ -303,6 +331,7 @@ function init(){
   new ResizeObserver(resize).observe(world);resize();applyPaint();
   camera.position.set(10,7,42);
   const desired=new THREE.Vector3(),look=new THREE.Vector3();
+  const sky=new THREE.Color(),sunsetSky=new THREE.Color('#d29189'),ghostSky=new THREE.Color('#797b82'),nightSky=new THREE.Color('#080b21');
   function frame(now){
     requestAnimationFrame(frame);const dt=Math.min((now-last)/1000||0,.04);last=now;
     const active=started&&!paused&&!inGarage;
@@ -321,7 +350,7 @@ function init(){
         }
       }
       for(const t of traffic){
-        const pos=((clock*7+t.phase+260)%520)-260;t.mesh.position.set(t.vertical?t.road:pos,0,t.vertical?pos:t.road);t.mesh.rotation.y=t.vertical?Math.PI:-Math.PI/2;
+        const pos=((clock*7+t.phase+500)%1000)-500;t.mesh.position.set(t.vertical?t.road:pos,0,t.vertical?pos:t.road);t.mesh.rotation.y=t.vertical?Math.PI:-Math.PI/2;
         if(Math.hypot(s.x-t.mesh.position.x,s.z-t.mesh.position.z)<3.7&&Math.abs(s.speed)>3&&crashCooldown===0){s.speed*=-.25;crashCooldown=2;toast('Traffic contact · Watch your lane');}
       }
     }
@@ -334,6 +363,12 @@ function init(){
     else{const dist=camMode===0?12:20;desired.set(s.x+Math.sin(s.angle)*dist,camMode===0?6.3:10,s.z+Math.cos(s.angle)*dist);look.set(s.x-Math.sin(s.angle)*6,1.1,s.z-Math.cos(s.angle)*6);}
     camera.position.lerp(desired,1-Math.exp(-5*dt));camera.lookAt(look);
     if(toastTime>0){toastTime-=dt;if(toastTime<=0)$('toast').classList.remove('visible');}
+    // Blend into midnight as the driver enters Neon Town; keep every exit connected.
+    const night=THREE.MathUtils.smoothstep(-s.z,0,85)*(1-THREE.MathUtils.smoothstep(Math.abs(s.x),120,190));
+    const ghost=THREE.MathUtils.smoothstep(-s.x,160,250)*THREE.MathUtils.smoothstep(-s.z,0,100);
+    sky.copy(sunsetSky).lerp(ghostSky,ghost*.7).lerp(nightSky,night);
+    scene.background.lerp(sky,1-Math.exp(-2*dt));scene.fog.color.copy(scene.background);
+    ambient.intensity=2.5-night*1.9-ghost*.7;sunLight.intensity=3.3-night*3.15-ghost*1.4;rim.intensity=1.1+night*.6;sun.visible=night<.5;
     hud();minimap();renderer.render(scene,camera);
   }
   renderer.render(scene,camera);
