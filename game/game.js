@@ -689,6 +689,7 @@ document.addEventListener("DOMContentLoaded", () => {
     particles.length = 0;
     resetPlayer();
     hideOverlay();
+    canvas.focus({ preventScroll: true });
     if (pauseButton) {
       pauseButton.disabled = false;
       pauseButton.textContent = "Pause";
@@ -906,6 +907,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (pauseButton) pauseButton.textContent = "Pause";
       if (runStatus) runStatus.textContent = "Night run in progress";
       hideOverlay();
+      canvas.focus({ preventScroll: true });
       cancelAnimationFrame(animationFrame);
       animationFrame = requestAnimationFrame(loop);
     }
@@ -2286,6 +2288,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function handlePrimaryAction(event) {
     if (event) event.preventDefault();
+    canvas.focus({ preventScroll: true });
     if (["idle", "gameover", "victory"].includes(mode)) startGame();
     else if (mode === "levelcomplete") startCurrentLevel();
     else if (mode === "paused") togglePause();
