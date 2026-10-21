@@ -12,12 +12,16 @@ const files = Object.fromEntries(await Promise.all([
   "contracts/DonRashidCoin.sol"
 ].map(async (path) => [path, await readFile(new URL(`../${path}`, import.meta.url), "utf8")])));
 
-test("adds Arcade navigation without removing the existing Game route", () => {
-  assert.match(files["index.html"], /href="\/games\/">Game<\/a>/);
+test("keeps the artist navigation focused and preserves game routes through the project hub", () => {
+  assert.match(files["index.html"], /href="#projects">Projects<\/a>/);
+  assert.match(files["index.html"], /class="project-card" href="\/games\/"/);
+  assert.doesNotMatch(files["index.html"], /trade-shortcut/);
   assert.doesNotMatch(files["index.html"], /Game 2 · 3D/);
   assert.match(files["games/index.html"], /href="\/game\/"/);
   assert.match(files["games/index.html"], /href="\/lowrider\/"/);
-  assert.match(files["index.html"], /href="\/arcade\/\?v=6">Arcade<\/a>/);
+  assert.match(files["games/index.html"], /href="https:\/\/donrashid\.com\/arcade\/\?v=6"/);
+  assert.match(files["games/index.html"], /https:\/\/game\.donrashid\.com\//);
+  assert.match(files["games/index.html"], /https:\/\/horsefarm\.donrashid\.com\//);
   assert.match(files["game/index.html"], /class="nav-current" href="\/games\/"/);
   assert.match(files["game/index.html"], /href="\/arcade\/\?v=\d+">Arcade<\/a>/);
 });
@@ -75,3 +79,4 @@ test("the live configuration references the verified Base Sepolia token", () => 
   assert.doesNotMatch(files["arcade/config.js"], /chainId:\s*"0x2105"/);
   assert.match(files["arcade/index.html"], /FREE PLAY • NO CASH OUT/);
 });
+

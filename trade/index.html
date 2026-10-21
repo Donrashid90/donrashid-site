@@ -1,78 +1,17 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="color-scheme" content="dark" />
-  <meta name="theme-color" content="#070708" />
-  <meta name="robots" content="noindex, nofollow" />
-  <title>Trade | Don Rashid</title>
-  <meta name="description" content="Current research status of White Phoenix V3.0 Alpha." />
-  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg?v=1" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
-  <style>
-    :root { color-scheme:dark; --bg:#070708; --panel:#111114; --line:rgba(243,240,233,.15); --ink:#f3f0e9; --soft:rgba(243,240,233,.68); --gold:#cba25b; }
-    * { box-sizing:border-box; }
-    body { margin:0; min-width:320px; background:var(--bg); color:var(--ink); font:16px/1.6 Manrope,Arial,sans-serif; }
-    a { color:inherit; }
-    a:focus-visible { outline:2px solid #edd498; outline-offset:5px; }
-    header { min-height:82px; padding:18px clamp(20px,5vw,76px); border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between; gap:20px; }
-    .brand { display:flex; align-items:center; gap:12px; text-decoration:none; white-space:nowrap; font:700 14px 'Space Grotesk',sans-serif; letter-spacing:.15em; }
-    .brand-mark { width:36px; height:36px; display:grid; place-items:center; border:1px solid var(--gold); color:#edd498; letter-spacing:-.08em; font-size:11px; }
-    .back { text-decoration:none; color:var(--soft); font-size:14px; }
-    .back:hover { color:var(--ink); }
-    main { width:min(1140px,100%); margin:0 auto; padding:clamp(34px,6vw,84px) clamp(20px,5vw,56px) 100px; }
-    .eyebrow { margin:0 0 12px; color:var(--gold); font-size:14px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; }
-    h1,h2,h3 { font-family:'Space Grotesk',Arial,sans-serif; letter-spacing:-.04em; line-height:1.15; }
-    h1 { margin:0; font-size:clamp(42px,7vw,86px); }
-    .lead { max-width:720px; margin:18px 0 28px; color:var(--soft); }
-    .notice { border:1px solid rgba(203,162,91,.48); background:rgba(203,162,91,.08); padding:18px 22px; }
-    .notice strong { color:#edd498; }
-    .grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; margin-top:32px; }
-    .card { min-width:0; padding:25px; border:1px solid var(--line); background:var(--panel); }
-    .card-label { margin:0 0 16px; color:var(--soft); font-size:14px; }
-    .metric { margin:0; font:700 clamp(26px,3.2vw,40px)/1.1 'Space Grotesk',Arial,sans-serif; }
-    .card p:last-child { margin-bottom:0; color:var(--soft); }
-    .section-title { margin:48px 0 20px; font-size:clamp(26px,3vw,36px); }
-    .steps { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
-    .steps h3 { margin:0 0 10px; font-size:21px; }
-    .steps p { margin:0; color:var(--soft); }
-    .status { display:inline-block; padding:7px 11px; border:1px solid rgba(203,162,91,.55); color:#edd498; font-size:14px; font-weight:700; }
-    .footnote { margin-top:32px; color:var(--soft); font-size:14px; }
-    @media(max-width:760px) { .grid,.steps { grid-template-columns:1fr; } header { min-height:70px; } .brand { font-size:12px; } }
-  </style>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><meta name="theme-color" content="#101315">
+<title>White Phoenix — Trading Research</title><meta name="description" content="White Phoenix is Don Rashid's separate trading-research project. Explore the current research workspace and demo-account preparation."><link rel="icon" href="https://white-phoenix-demo.chummy-knoll-6431.chatgpt.site/favicon.svg">
+<style>
+:root{color-scheme:dark;--bg:#101315;--ink:#f3f1eb;--muted:#acb5b3;--gold:#dbc493;--line:#ffffff1c}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.8 Arial,Helvetica,sans-serif}a{color:var(--gold);text-underline-offset:4px}a:focus-visible{outline:2px solid var(--gold);outline-offset:5px}header{display:flex;align-items:center;justify-content:space-between;gap:24px;max-width:1280px;margin:auto;padding:24px 32px;border-bottom:1px solid var(--line)}.brand{display:flex;align-items:center;gap:12px;color:var(--ink);text-decoration:none;font-size:13px;font-weight:600;letter-spacing:.12em}.brand svg{width:40px;height:40px;color:var(--gold)}.brand small{display:block;color:var(--gold);font-weight:400;font-size:9px;letter-spacing:.18em}header>a:last-child{font-size:12px;color:var(--muted);text-decoration:none}main{max-width:1100px;padding:80px 32px 65px;margin:auto}.eyebrow{font-size:10px;letter-spacing:.17em;color:var(--gold)}h1{font-size:clamp(42px,7vw,76px);line-height:1.04;letter-spacing:-.055em;font-weight:500;margin:24px 0}h1 span{color:var(--gold)}.intro{max-width:650px;color:var(--muted);font-size:17px;line-height:1.8}.button{display:inline-flex;align-items:center;justify-content:center;background:var(--gold);color:var(--bg);text-decoration:none;font-weight:600;font-size:14px;border-radius:8px;padding:13px 23px;min-height:48px;margin:20px 0}.status{font-size:12px;color:var(--muted);max-width:680px}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin:55px 0}.grid article{border:1px solid var(--line);background:#1a1e20;padding:27px;border-radius:12px}.grid article>span{font-size:11px;color:var(--gold)}h2{font-size:23px;letter-spacing:-.03em;font-weight:500;margin:18px 0 14px}.grid p{font-size:13px;color:var(--muted);line-height:1.8}.note{padding-top:25px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}.footer{max-width:1036px;margin:auto;padding:25px 0 35px;border-top:1px solid var(--line);font-size:10px;color:var(--muted);letter-spacing:.1em}@media(max-width:650px){header{padding:20px;gap:15px}.brand{font-size:10px}.brand small{font-size:8px}header>a:last-child{font-size:11px}main{padding:50px 22px}.intro{font-size:15px}.grid{grid-template-columns:1fr;margin-top:35px;gap:14px}.footer{margin:0 22px}}
+</style>
 </head>
 <body>
-  <header>
-    <a class="brand" href="/" aria-label="Don Rashid – homepage"><span class="brand-mark" aria-hidden="true">DR</span><span>DON RASHID</span></a>
-    <a class="back" href="/">← Back to website</a>
-  </header>
-  <main>
-    <p class="eyebrow">White Phoenix / V3.0 Alpha</p>
-    <h1>Trade</h1>
-    <p class="lead">See the trading bot’s current status and the checks required before connecting an account.</p>
-    <div class="notice" role="status"><strong>Trading disabled.</strong> The strategy is still undergoing data checks. This page does not connect an account or place orders.</div>
-    <p class="footnote"><a class="status" href="https://white-phoenix-demo.chummy-knoll-6431.chatgpt.site/">Sign in to Trade ↗</a> &nbsp; Access is by personal invitation. Sign in with your own account to run a read-only Binance Demo check. API keys are not saved, and trading remains disabled.</p>
+<header><a class="brand" href="/trade/"><svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M20 32 8 18l9 5-5-13 8 10 8-10-5 13 9-5-12 14Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="m20 20-2-11 2-4 2 4-2 11Z" fill="currentColor"/></svg><span>WHITE PHOENIX<small>TRADING RESEARCH</small></span></a><a href="https://donrashid.com/">Visit Don Rashid ↗</a></header>
+<main><p class="eyebrow">AN INDEPENDENT DON RASHID PROJECT</p><h1>Research first.<br><span>Evidence matters.</span></h1><p class="intro">A dedicated workspace for trading models, historical comparisons and demo-account preparation. White Phoenix is a research project in development.</p><a class="button" href="https://white-phoenix-demo.chummy-knoll-6431.chatgpt.site/">Open the research workspace ↗</a><p class="status">The workspace is private and requires an authorised account. Connecting a demo account does not start a bot. Live trading and automated order execution are not enabled.</p>
+<section class="grid" aria-label="What is inside the research workspace"><article><span>01 / MODELS</span><h2>Know the rules.</h2><p>Explore Standard, the frozen R1C main model and the saved S3, S5 and S6 research variants.</p></article><article><span>02 / RESEARCH</span><h2>Read the evidence.</h2><p>Compare existing simulations with their costs, drawdowns and limitations. Historical results are not a forecast of future returns.</p></article><article><span>03 / ACCOUNT</span><h2>Prepare the demo.</h2><p>Use the private workspace for read-only Binance Demo verification and model assignments. Never enter API keys on this public page.</p></article></section>
+<p class="note">Part of the wider Don Rashid world, with its own purpose and identity. <a href="/">Explore the music</a> or <a href="/games/">visit the games</a>.</p></main>
+<footer class="footer">WHITE PHOENIX · A DON RASHID PROJECT</footer>
+</body></html>
 
-    <section aria-labelledby="status-heading">
-      <h2 class="section-title" id="status-heading">Current status</h2>
-      <div class="grid">
-        <article class="card"><p class="card-label">Verified source archives, July–September 2022</p><p class="metric">871 / 871</p><p>Checksums valid; no internal monthly gaps.</p></article>
-        <article class="card"><p class="card-label">Potential funding gaps, cumulative</p><p class="metric">14 months</p><p>Potential gaps for ICPUSDT and TLMUSDT since 2021.</p></article>
-        <article class="card"><p class="card-label">Binance account</p><p class="metric">Not connected</p><p>A separate read-only connection check is ready.</p></article>
-      </div>
-    </section>
-
-    <section aria-labelledby="next-heading">
-      <h2 class="section-title" id="next-heading">Before connecting</h2>
-      <div class="steps">
-        <article class="card"><h3>1. Complete the research</h3><p>Verify historical exchange filters, funding mark prices and execution. Then evaluate the strategy on data outside the development period.</p></article>
-        <article class="card"><h3>2. Connect the account safely</h3><p>The connection requires a secure server and a dedicated Binance key with read-only access. Never enter API credentials on this public website or in a chat.</p></article>
-      </div>
-    </section>
-    <p class="footnote"><span class="status">As of 28 September 2026</span> Research results do not promise returns. A successful account check does not enable trading.</p>
-  </main>
-</body>
-</html>
