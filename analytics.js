@@ -12,7 +12,7 @@
 (() => {
   'use strict';
 
-  const SITE_TOKEN = '';
+  const SITE_TOKEN = '8f5858befb64436cbb4f8fb84ccb509c';
 
   const host = window.location.hostname.toLowerCase();
   if (host !== 'donrashid.com' && host !== 'www.donrashid.com') return;
