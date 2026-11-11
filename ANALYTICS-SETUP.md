@@ -2,16 +2,11 @@
 
 **Site:** https://donrashid.com
 **GitHub Pages:** this repo's main branch
-**Status:** installed, **inactive until a Cloudflare site token is entered** in /analytics.js.
+**Status:** Active Cloudflare website token configured on 2026-11-11. GitHub Pages deployment and Cloudflare reception should be verified.
 
-## One-time activation
+## Activation completed / verification
 
-1. Sign in or sign up at https://dash.cloudflare.com.
-2. Open **Analytics & Logs → Web Analytics** (or search for **Web Analytics**).
-3. Choose **Add a site**. Enter hostname **donrashid.com**. Do **not** migrate DNS.
-4. Open **Manage site**, copy the JavaScript beacon snippet.
-5. In `analytics.js` replace `const SITE_TOKEN = '';` with the **public site token** from `data-cf-beacon='{"token":"..."}'` (or provide just that snippet to your developer).
-6. Push to main and check the **Web Analytics** dashboard after visiting the site in a normal browser.
+Cloudflare Web Analytics site was created for `donrashid.com` and its public token added to `/analytics.js`. Once GitHub Pages finishes deploying, visit the site in a normal browser and check the **Cloudflare → Analytics & Logs → Web Analytics** dashboard for incoming page views. DNS does not need to be changed.
 
 **Security:** never share your Cloudflare password, login code, or API key. The site token is a public site identifier.
 
