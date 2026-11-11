@@ -272,3 +272,5 @@
 .dr-home .site-footer > p, .dr-home .site-footer small { color: var(--muted); }
 .dr-home .text-links { flex-wrap: wrap; }
 .dr-home .text-links a { flex: 0 1 auto; padding: 8px 14px 8px 0; align-items: center; }
+
+.dr-home .section-index { color: var(--muted); }
