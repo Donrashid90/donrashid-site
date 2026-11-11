@@ -26,3 +26,13 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   window.matchMedia('(max-width: 900px)').addEventListener('change', () => closeNavigation());
 });
+
+// Shared visitor-statistics loader for official Don Rashid artist pages.
+// Analytics stays disabled until the public Cloudflare site token is set
+// in /analytics.js. This does not load analytics on separate game sites.
+if (location.hostname === 'donrashid.com' || location.hostname === 'www.donrashid.com') {
+  const analyticsLoader = document.createElement('script');
+  analyticsLoader.src = '/analytics.js';
+  analyticsLoader.defer = true;
+  document.head.appendChild(analyticsLoader);
+}
