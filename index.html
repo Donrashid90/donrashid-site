@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover.0" />
 
   <title>Don Rashid | Official Website — West Coast &amp; G-Funk Rap</title>
   <meta name="description" content="Official website of Don Rashid, independent Swiss hip-hop artist. Explore West Coast and G-Funk rap, African Analog, Lowrider, videos and music." />
@@ -28,10 +28,10 @@
   <meta name="twitter:image" content="https://donrashid.com/assets/hero.jpg" />
 
   <link rel="preload" as="image" href="/assets/hero.webp" type="image/webp" fetchpriority="high" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=11" />
+
+
+
+  <link rel="stylesheet" href="style.css?v=12" />
 
   <script type="application/ld+json">
   {
@@ -61,43 +61,25 @@
     "publisher": {"@id": "https://donrashid.com/#artist"}
   }
   </script>
+<link rel="stylesheet" href="/artist.css?v=1">
+<script src="/artist.js?v=1" defer></script>
 </head>
-<body>
+<body class="dr-site dr-home">
   <a class="skip-link" href="#main-content">Skip to content</a>
   <div class="page-grain" aria-hidden="true"></div>
 
-  <header class="site-header" id="top">
-    <a class="brand" href="#top" aria-label="Don Rashid home">
-      <span class="brand-mark" aria-hidden="true">DR</span>
-      <span class="brand-name">DON RASHID</span>
-    </a>
+  <header class="dr-header" id="top">
+  <a class="dr-brand" href="/" aria-label="Don Rashid home"><span class="dr-monogram" aria-hidden="true">DR</span><span>DON RASHID</span></a>
+  <button class="dr-menu" type="button" aria-expanded="false" aria-controls="dr-nav" hidden>Menu<svg class="dr-icon" aria-hidden="true" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6h14M2 12h14"/></svg></button>
+  <nav class="dr-nav" id="dr-nav" aria-label="Main navigation"><a href="/music/">Music</a><a href="/west-coast-g-funk/">G-Funk</a><a href="/albums/">Albums</a><a href="/videos/">Videos</a><a href="/#merch">Merch</a><a href="/about/">About</a><a href="/#projects">Projects</a><a class="dr-button" href="https://open.spotify.com/artist/0HbtnpVZONVd7S09jqmRZZ" target="_blank" rel="noopener noreferrer">Spotify<svg class="dr-icon" aria-hidden="true" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13 13 5M6 5h7v7"/></svg></a></nav>
+</header>
 
-    <button class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="site-nav">
-      <span></span>
-      <span></span>
-    </button>
-
-    <nav class="site-nav" id="site-nav" aria-label="Main navigation">
-      <a href="#music">Music</a>
-      <a href="/albums/">Albums</a>
-      <a href="https://youtube.com/@donrashidofficial" target="_blank" rel="noopener noreferrer">Videos <span class="arrow" aria-hidden="true">&#8599;&#65038;</span></a>
-      <a href="#merch">Merch</a>
-      <a href="#artist">About</a>
-      <a href="#projects">Projects</a>
-      <a class="nav-stream" href="https://open.spotify.com/artist/0HbtnpVZONVd7S09jqmRZZ" target="_blank" rel="noopener noreferrer">Stream <span class="arrow" aria-hidden="true">&#8599;&#65038;</span></a>
-    </nav>
-  </header>
-
-  <main id="main-content">
+  <main id="main-content" tabindex="-1">
     <section class="hero" aria-labelledby="hero-title">
-      <div class="hero-media" role="img" aria-label="Don Rashid in a cinematic night setting"></div>
+      <div class="hero-media"><img src="/assets/hero.webp" width="1024" height="1536" alt="Don Rashid in cinematic artist artwork" fetchpriority="high" decoding="async"></div>
       <div class="hero-shade" aria-hidden="true"></div>
 
-      <div class="hero-meta">
-        <span>Independent artist</span>
-        <span class="hero-meta-line"></span>
-        <span>West Coast / Global</span>
-      </div>
+
 
       <div class="hero-content">
         <p class="kicker">West Coast cinematic rap</p>
@@ -105,25 +87,14 @@
 
         <div class="hero-lower">
           <p>Lowrider G-funk, heavy drums and cinematic night-drive atmosphere — built independently, released without borders.</p>
-          <div class="hero-actions">
-            <a class="action action-primary" href="#music">Enter the sound <span aria-hidden="true">↓</span></a>
-            <a class="action action-ghost" href="https://youtube.com/@donrashidofficial" target="_blank" rel="noopener noreferrer">Watch on YouTube <span class="arrow" aria-hidden="true">&#8599;&#65038;</span></a>
-          </div>
+          <div class="hero-actions"><a class="dr-button dr-button-primary" href="/music/">Explore Releases<svg class="dr-icon" aria-hidden="true" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h12m-5-5 5 5-5 5"/></svg></a><a class="dr-button" href="/videos/">Watch Official Videos<svg class="dr-icon" aria-hidden="true" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h12m-5-5 5 5-5 5"/></svg></a></div>
         </div>
       </div>
 
-      <a class="hero-scroll" href="#music" aria-label="Scroll to music">
-        <span>Scroll</span>
-        <i aria-hidden="true"></i>
-      </a>
+
     </section>
 
-    <div class="signal" aria-label="Don Rashid sound identity">
-      <div class="signal-track">
-        <span>G-FUNK</span><i></i><span>NIGHT DRIVE</span><i></i><span>HEAVY BASS</span><i></i><span>GLOBAL VIBES</span><i></i>
-        <span aria-hidden="true">G-FUNK</span><i aria-hidden="true"></i><span aria-hidden="true">NIGHT DRIVE</span><i aria-hidden="true"></i><span aria-hidden="true">HEAVY BASS</span><i aria-hidden="true"></i><span aria-hidden="true">GLOBAL VIBES</span><i aria-hidden="true"></i>
-      </div>
-    </div>
+
 
     <section id="music" class="section music-section">
       <div class="section-shell">
@@ -149,19 +120,17 @@
           </div>
 
           <aside class="sound-note">
-            <span class="sound-note-number">3072</span>
             <div>
-              <p class="eyebrow">One artist world</p>
               <h3>More than individual tracks.</h3>
               <p>Every release belongs to the same world — chrome, pressure, midnight streets and independent vision.</p>
             </div>
             <div class="text-links">
-              <a href="/music/">G-Funk &amp; lowrider rap <span class="arrow" aria-hidden="true">&#8599;&#65038;</span></a>
-              <a href="/west-coast-g-funk/">Discover West Coast G-Funk <span class="arrow" aria-hidden="true">&#8599;&#65038;</span></a>
-              <a href="/videos/">Music videos &amp; Shorts <span class="arrow" aria-hidden="true">&#8599;&#65038;</span></a>
-              <a href="https://open.spotify.com/artist/0HbtnpVZONVd7S09jqmRZZ" target="_blank" rel="noopener noreferrer">Spotify <span class="arrow" aria-hidden="true">&#8599;&#65038;</span></a>
-              <a href="https://youtube.com/@donrashidofficial" target="_blank" rel="noopener noreferrer">YouTube <span class="arrow" aria-hidden="true">&#8599;&#65038;</span></a>
-              <a href="https://x.com/donrashid72" target="_blank" rel="noopener noreferrer">X <span class="arrow" aria-hidden="true">&#8599;&#65038;</span></a>
+              <a href="/music/">G-Funk &amp; lowrider rap <svg class="dr-icon" aria-hidden="true" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h12m-5-5 5 5-5 5"/></svg></a>
+              <a href="/west-coast-g-funk/">Discover West Coast G-Funk <svg class="dr-icon" aria-hidden="true" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h12m-5-5 5 5-5 5"/></svg></a>
+              <a href="/videos/">Music videos &amp; Shorts <svg class="dr-icon" aria-hidden="true" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h12m-5-5 5 5-5 5"/></svg></a>
+              <a href="https://open.spotify.com/artist/0HbtnpVZONVd7S09jqmRZZ" target="_blank" rel="noopener noreferrer">Spotify <svg class="dr-icon" aria-hidden="true" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13 13 5M6 5h7v7"/></svg></a>
+              <a href="https://youtube.com/@donrashidofficial" target="_blank" rel="noopener noreferrer">YouTube <svg class="dr-icon" aria-hidden="true" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13 13 5M6 5h7v7"/></svg></a>
+              <a href="https://x.com/donrashid72" target="_blank" rel="noopener noreferrer">X <svg class="dr-icon" aria-hidden="true" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13 13 5M6 5h7v7"/></svg></a>
             </div>
           </aside>
         </div>
@@ -227,7 +196,7 @@
 
             <div class="merch-actions">
               <span class="action merch-soldout">Sold out <span aria-hidden="true">×</span></span>
-              <a class="merch-alert" href="#drop-002">Drop 002 preview <span aria-hidden="true">↓</span></a>
+              <a class="merch-alert" href="#drop-002">Drop 002 preview <svg class="dr-icon" aria-hidden="true" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v12m-5-5 5 5 5-5"/></svg></a>
             </div>
             <p class="merch-quality-note">Drop 001 is permanently retired.</p>
           </div>
@@ -250,7 +219,7 @@
             <p class="eyebrow">Drop 002 / Coming soon</p>
             <h3 id="drop-002-title">The next<br />night drive.</h3>
             <p>The artwork for the next Don Rashid artist edition has arrived. Release date, product details and the official drop name will be revealed soon.</p>
-            <a class="merch-alert" href="mailto:contact@donrashid.com?subject=Don%20Rashid%20Drop%20002%20Alert">Get Drop 002 alert <span class="arrow" aria-hidden="true">&#8599;&#65038;</span></a>
+            <a class="merch-alert" href="mailto:contact@donrashid.com?subject=Don%20Rashid%20Drop%20002%20Alert">Get Drop 002 alert <svg class="dr-icon" aria-hidden="true" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13 13 5M6 5h7v7"/></svg></a>
           </div>
         </aside>
       </div>
@@ -267,7 +236,7 @@
           <div class="artist-copy" data-reveal>
             <p class="artist-lead">West Coast DNA. Swiss precision. Global vision.</p>
             <p>Don Rashid builds a complete universe around the music — lowrider grooves, cinematic darkness and influences that move beyond borders. Every track, visual and future drop carries the same signature.</p>
-            <a class="line-link" href="https://youtube.com/@donrashidofficial" target="_blank" rel="noopener noreferrer">Explore the channel <span class="arrow" aria-hidden="true">&#8599;&#65038;</span></a>
+            <a class="line-link" href="https://youtube.com/@donrashidofficial" target="_blank" rel="noopener noreferrer">Explore the channel <svg class="dr-icon" aria-hidden="true" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13 13 5M6 5h7v7"/></svg></a>
           </div>
         </div>
 
@@ -283,8 +252,8 @@
       <div class="section-shell">
         <div class="section-intro" data-reveal><p class="section-index"><span>04</span> Independent projects</p><h2 id="projects-title">Beyond<br /><em>the music.</em></h2><p class="section-lead">Different worlds. The same independent spirit. Explore the games and research projects built alongside the music.</p></div>
         <div class="project-grid" data-reveal>
-          <a class="project-card" href="/games/"><svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M16 15h16c5 0 8 17 4 18-3 1-7-6-9-6h-6c-2 0-6 7-9 6-4-1-1-18 4-18Z" stroke="currentColor" stroke-width="1.5"/><path d="M17 19v8m-4-4h8" stroke="currentColor" stroke-width="1.5"/><circle cx="30" cy="21" r="1.5" fill="currentColor"/><circle cx="34" cy="25" r="1.5" fill="currentColor"/></svg><span class="eyebrow">PLAY / EXPLORE</span><h3>Don Rashid Games</h3><p>Lowrider streets, browser adventures and the worlds of Horse Farm. Find your next place to play.</p><span class="project-action">Explore games <span aria-hidden="true">↗</span></span></a>
-          <a class="project-card" href="https://white-phoenix-demo.chummy-knoll-6431.chatgpt.site/"><svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M20 32 8 18l9 5-5-13 8 10 8-10-5 13 9-5-12 14Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="m20 20-2-11 2-4 2 4-2 11Z" fill="currentColor"/></svg><span class="eyebrow">WHITE PHOENIX / TRADING RESEARCH</span><h3>Research. Then execution.</h3><p>A separate workspace for trading-model research, historical comparisons and demo-account preparation.</p><span class="project-action">Visit White Phoenix <span aria-hidden="true">↗</span></span></a>
+          <a class="project-card" href="/games/"><svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M16 15h16c5 0 8 17 4 18-3 1-7-6-9-6h-6c-2 0-6 7-9 6-4-1-1-18 4-18Z" stroke="currentColor" stroke-width="1.5"/><path d="M17 19v8m-4-4h8" stroke="currentColor" stroke-width="1.5"/><circle cx="30" cy="21" r="1.5" fill="currentColor"/><circle cx="34" cy="25" r="1.5" fill="currentColor"/></svg><span class="eyebrow">PLAY / EXPLORE</span><h3>Don Rashid Games</h3><p>Lowrider streets, browser adventures and the worlds of Horse Farm. Find your next place to play.</p><span class="project-action">Explore games <svg class="dr-icon" aria-hidden="true" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h12m-5-5 5 5-5 5"/></svg></span></a>
+          <a class="project-card" href="https://white-phoenix-demo.chummy-knoll-6431.chatgpt.site/"><svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M20 32 8 18l9 5-5-13 8 10 8-10-5 13 9-5-12 14Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="m20 20-2-11 2-4 2 4-2 11Z" fill="currentColor"/></svg><span class="eyebrow">WHITE PHOENIX / TRADING RESEARCH</span><h3>Research. Then execution.</h3><p>A separate workspace for trading-model research, historical comparisons and demo-account preparation.</p><span class="project-action">Visit White Phoenix <svg class="dr-icon" aria-hidden="true" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13 13 5M6 5h7v7"/></svg></span></a>
         </div>
       </div>
     </section>
@@ -293,7 +262,7 @@
       <div class="contact-shell" data-reveal>
         <p class="eyebrow">Music / visuals / collaborations</p>
         <h2>LET'S BUILD<br />SOMETHING <em>REAL.</em></h2>
-        <a class="contact-link" href="mailto:contact@donrashid.com">contact@donrashid.com <span class="arrow" aria-hidden="true">&#8599;&#65038;</span></a>
+        <a class="contact-link" href="mailto:contact@donrashid.com">contact@donrashid.com <svg class="dr-icon" aria-hidden="true" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13 13 5M6 5h7v7"/></svg></a>
       </div>
     </section>
   </main>
@@ -319,7 +288,6 @@
     <small>© <span id="year">2026</span> Don Rashid</small>
   </footer>
 
-  <script src="script.js?v=2"></script>
+  <script src="script.js?v=3"></script>
 </body>
 </html>
-
