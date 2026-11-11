@@ -30,7 +30,7 @@
   --gold-light: #edd498;
   --display: "Space Grotesk", Arial, sans-serif;
   --body: "Manrope", Arial, sans-serif;
-  --artist-image: url("https://donrashid.com/assets/hero.jpg");
+  --artist-image: url("/assets/hero.webp");
 }
 
 html {
