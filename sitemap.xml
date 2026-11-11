@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
   <url><loc>https://donrashid.com/</loc></url>
   <url><loc>https://donrashid.com/music/</loc></url>
   <url><loc>https://donrashid.com/west-coast-g-funk/</loc></url>
@@ -19,4 +19,26 @@
   <url><loc>https://donrashid.com/game/</loc></url>
   <url><loc>https://donrashid.com/lowrider/</loc></url>
   <url><loc>https://donrashid.com/arcade/</loc></url>
+  <url>
+    <loc>https://donrashid.com/videos/westbound/</loc>
+    <video:video>
+      <video:thumbnail_loc>https://donrashid.com/assets/editorial/2sA8HdaUaro.webp</video:thumbnail_loc>
+      <video:title>WESTBOUND — Don Rashid</video:title>
+      <video:description>Watch WESTBOUND by Don Rashid. Old-school drums drive this West Coast G-Funk track for an open-road sunset cruise.</video:description>
+      <video:player_loc>https://www.youtube-nocookie.com/embed/2sA8HdaUaro</video:player_loc>
+      <video:duration>219</video:duration>
+      <video:publication_date>2026-09-02T10:00:19-07:00</video:publication_date>
+    </video:video>
+  </url>
+  <url>
+    <loc>https://donrashid.com/videos/chrome-after-dark/</loc>
+    <video:video>
+      <video:thumbnail_loc>https://donrashid.com/assets/editorial/8FZW1jduibA.webp</video:thumbnail_loc>
+      <video:title>CHROME AFTER DARK — Don Rashid</video:title>
+      <video:description>Watch CHROME AFTER DARK by Don Rashid. A bass-heavy West Coast G-Funk video built around chrome reflections and midnight lowrider cruising.</video:description>
+      <video:player_loc>https://www.youtube-nocookie.com/embed/8FZW1jduibA</video:player_loc>
+      <video:duration>226</video:duration>
+      <video:publication_date>2026-08-22T10:00:26-07:00</video:publication_date>
+    </video:video>
+  </url>
 </urlset>
