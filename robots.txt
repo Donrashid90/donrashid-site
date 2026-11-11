@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://donrashid.com/sitemap.xml
