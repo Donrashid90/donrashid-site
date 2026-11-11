@@ -18,3 +18,30 @@ if (!reducedMotion && 'IntersectionObserver' in window) {
 
 const year = document.getElementById('year');
 if (year) year.textContent = String(new Date().getFullYear());
+
+const lowriderLaunch = document.getElementById('lowrider-launch');
+const lowriderPlayer = document.getElementById('lowrider-player');
+
+if (lowriderLaunch && lowriderPlayer && typeof lowriderPlayer.showModal === 'function') {
+  const playerFrame = lowriderPlayer.querySelector('.feature-player-frame');
+  lowriderLaunch.setAttribute('aria-haspopup', 'dialog');
+
+  lowriderLaunch.addEventListener('click', (event) => {
+    if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+    lowriderPlayer.showModal();
+    event.preventDefault();
+
+    const video = document.createElement('iframe');
+    video.src = 'https://www.youtube-nocookie.com/embed/lYDPsgbOppM?autoplay=1';
+    video.title = 'LOWRIDER — Don Rashid official music video';
+    video.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+    video.allowFullscreen = true;
+    video.referrerPolicy = 'strict-origin-when-cross-origin';
+    playerFrame.replaceChildren(video);
+  });
+
+  lowriderPlayer.addEventListener('close', () => {
+    playerFrame.replaceChildren();
+    lowriderLaunch.focus();
+  });
+}
