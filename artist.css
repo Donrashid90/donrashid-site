@@ -285,3 +285,67 @@
 .dr-watch .video-embed { max-width: none; margin: 0 0 34px; }
 .dr-watch .video-embed figcaption { padding: 0; }
 .dr-watch .video-embed figcaption a { display: inline-flex; align-items: center; min-height: 44px; }
+
+/* Official YouTube subscription: one primary action and an understated channel link. */
+.dr-inner .dr-video-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+  margin-top: 23px;
+}
+.dr-inner .dr-video-hero-actions .dr-button { margin-top: 0; }
+.dr-video-channel-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  color: var(--gold-light);
+  font-size: 13px;
+  font-weight: 700;
+}
+.dr-video-channel-link:hover { color: var(--text); text-decoration: underline; text-underline-offset: 4px; }
+
+/* Restrained monochrome social icons on inner pages. */
+.dr-inner .dr-connect-socials,
+.dr-inner .dr-footer-socials {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 11px;
+}
+.dr-inner .dr-connect-socials { margin-top: 22px; margin-bottom: 20px; }
+.dr-inner .prose .dr-social-icon,
+.dr-inner .dr-social-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border: 1px solid #ffffff37;
+  border-radius: 2px;
+  background: transparent;
+  color: var(--muted);
+  text-decoration: none;
+  transition: background .2s ease, border-color .2s ease, color .2s ease;
+}
+.dr-inner .dr-social-icon svg { width: 22px; height: 22px; }
+.dr-inner .dr-social-icon:hover,
+.dr-inner .dr-social-icon:focus-visible {
+  color: var(--gold-light);
+  border-color: var(--gold);
+  background: #ffffff0b;
+}
+.dr-inner .prose .dr-connect-contact { margin-top: 18px; }
+.dr-inner .dr-inner-footer-links { display: grid; gap: 17px; justify-items: end; }
+.dr-inner .dr-inner-footer-links nav { justify-content: flex-end; }
+.dr-inner .dr-footer-socials { gap: 10px; }
+.dr-inner .dr-footer-socials .dr-social-icon { width: 44px; height: 44px; }
+@media (max-width: 760px) {
+  .dr-inner .dr-video-hero-actions { align-items: flex-start; }
+  .dr-inner .dr-inner-footer-links { justify-items: start; }
+  .dr-inner .dr-inner-footer-links nav { justify-content: flex-start; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dr-inner .dr-social-icon { transition: none; }
+}
